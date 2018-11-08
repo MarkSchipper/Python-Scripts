@@ -1,6 +1,7 @@
 import maya.cmds as base
 from math import pow, sqrt, cos, acos, radians
 
+global armTwist
 armTwist = base.intField(minValue = 2, maxValue = 10, value = 3)
 
 def CreateSecLocatorWindows():

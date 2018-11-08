@@ -39,6 +39,11 @@ def createJoints(spineAmount,amount):
     createHead(spineAmount)
     createArmJoints(spineAmount)
     createFingerJoints(amount)
+    
+    if (base.objExists('Loc_L_INV_Heel*')):
+        createInverseFootRoll()
+    else:
+        print ''    
     createLegs()
     
     
@@ -138,6 +143,24 @@ def createLegs():
     R_KneeJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_LowerLeg'), q = True, t = True, ws = True), name = 'RIG_R_LowerLeg')  
     R_FootJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_Foot'), q = True, t = True, ws = True)  , name = 'RIG_R_Foot') 
     R_ToeJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_Toes'), q = True, t = True, ws = True), name = 'RIG_R_Toes')
+
+def createInverseFootRoll():
+    base.select(deselect = True)
+
+    L_heel = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_INV_Heel', type = 'transform'), q = True, t = True, ws = True), name = 'RIG_L_INV_Heel')
+    L_toel = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_INV_Toes', type = 'transform'), q = True, t = True, ws = True), name = 'RIG_L_INV_Toes')
+    L_ball = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_INV_Ball', type = 'transform'), q = True, t = True, ws = True), name = 'RIG_L_INV_Ball')
+    L_ankle = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_INV_Ankle', type = 'transform'), q = True, t = True, ws = True), name = 'RIG_L_INV_Ankle')
+    base.parent(L_heel, 'RIG')
+
+    base.select(deselect = True)
+
+
+    R_heel = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_INV_Heel', type = 'transform'), q = True, t = True, ws = True), name = 'RIG_R_INV_Heel')
+    R_toel = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_INV_Toes', type = 'transform'), q = True, t = True, ws = True), name = 'RIG_R_INV_Toes')
+    R_ball = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_INV_Ball', type = 'transform'), q = True, t = True, ws = True), name = 'RIG_R_INV_Ball')
+    R_ankle = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_INV_Ankle', type = 'transform'), q = True, t = True, ws = True), name = 'RIG_R_INV_Ankle')
+    base.parent(R_heel, 'RIG')
 
 def setJointOrientation():
 
