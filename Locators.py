@@ -1,6 +1,11 @@
 import maya.cmds as base
 
+##############################################
+##            Locators class                ##
+## Creates all the Locators					##
+##############################################
 
+# create the input fields for the amount of spines and fingers
 def createFields():    
     global spineCount
     global fingerCount
@@ -10,29 +15,37 @@ def createFields():
     base.text("Fingers Amount", l = "Fingers Amount")
     fingerCount = base.intField(minValue = 1, maxValue = 10, value = 5)
     
- 
-
+# return the value from the spineCount int field
 def ReturnFingerAmount():
     return base.intField(fingerCount, query = True, value = True)
-    
+
+# return the value from the fingerCount int field    
 def ReturnSpineAmount():
    return base.intField(spineCount, query = True, value = True)    
 
+# Create the Locators
 def CreateLocators():
-              
+    
+    # Check if the object 'Loc_Master' exists, if it does do nothing
+    # else create an empty ( em = True ) group and name it          
     if base.objExists('Loc_Master'):
         print 'Loc_Master already exists'
     else:
         base.group(em = True, name = "Loc_Master")
-        
+    
+    # Create a new spaceLocator and store it in the var root
+    # Scale it down and move it, parent it to the group    
     root = base.spaceLocator(n = "Loc_ROOT")    
     base.scale(0.1,0.1,0.1, root)
     base.move(0,1,0, root)
     base.parent(root, "Loc_Master")
 
     createSpine()
-    
+
+# create the spine function    
 def createSpine():
+    
+    # simple for loop, check how many spines we need to create
     for i in range(0, base.intField(spineCount, query = True, value = True)):
         spine = base.spaceLocator(n = 'Loc_SPINE_' + str(i))
         base.scale(0.1, 0.1, 0.1, spine)
@@ -48,6 +61,7 @@ def createSpine():
     createLegs(1)
     createLegs(-1)
     
+    # set colors of the objects
     setColors()
     
 def createHead():
