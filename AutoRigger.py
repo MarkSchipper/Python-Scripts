@@ -4,38 +4,51 @@ import Joints
 import SecondaryLocators
 
 # we reload all classes when this file is executed, else we would need to restart Maya after every change
-Locators = reload(Locators)
+reload(Locators)
 Joints = reload(Joints)
 SecondaryLocators = reload(SecondaryLocators)
 global selected
 
-###########################################
-#         Create the basic window        ##
-###########################################
+class AutoRigger():
+    
+    def __init__(self):
+        self.widgets = {}
+        self.BuildUI()
+       # spineValue = 0
+        
+        
+    def BuildUI(self): 
+        #global spineValue 
+        ###########################################
+        #         Create the basic window        ##
+        ###########################################
+        
+        # Create a window with the name Auto Rigger
+        
+        base.window("Auto Rigger")
 
-# Create a window with the name Auto Rigger
+        # set the layout of the window
+        base.rowColumnLayout(nc = 2, columnWidth=[(1,175), (2, 225)])
 
-base.window("Auto Rigger")
-
-# set the layout of the window
-base.rowColumnLayout(nc = 1)
-
-# Call the createFields function in the Locators file
-Locators.createFields()
-# separate the fields
-base.separator(h = 5)
-base.button(l = "Create Base Locators", w = 200, c = "Locators.CreateLocators()")
-base.separator(h = 10)
-base.button(l = "Create Secondary Locators", w = 200, c = "SecondaryLocators.CreateSecLocatorWindows()")
-base.separator(h = 10)
-base.button(l = "Delete All Locators", w = 200, c = "Locators.deleteLocators()")
-base.separator(h = 10)
-base.button(l = "Mirror L->R", w = 200, c = "Locators.mirrorLocators()")
-base.separator(h = 15)
-base.button(l = "Create Joints", w = 200, c = "Joints.CreateJointsWindow()")
-
-base.separator(h = 20)
-base.separator()
-
-# show the actual window
-base.showWindow()
+        settingsText = base.text('Settings', l = 'Rig Settings')
+        base.separator(st = 'none')       
+        base.text(l = 'Prefix', w = 100)
+        base.textField(w = 100)
+        base.text(l = "Amount of Spines", w = 100)
+        spineCount = base.intField(minValue = 1, maxValue = 10, value = 4)
+        spineValue = base.intField(spineCount, query = True, value = True)
+        print spineValue
+        base.text(l = "Amount of Fingers", w = 100)
+        fingerCount = base.intField(minValue = 0, maxValue = 10, value = 5)    
+        
+        base.button(l = "Create Base Locators", w = 200, c = "Locators.CreateLocators("+str(base.intField(spineCount, query = True, value = True))+","+str(base.intField(fingerCount, query = True, value = True))+ ")")
+        base.separator(st = 'none')
+        base.button(l = "Create Secondary Locators", w = 200, c = "SecondaryLocators.CreateSecLocatorWindows()")
+        base.separator(st = 'none')
+        base.button(l = "Delete All Locators", w = 200, c = "Locators.deleteLocators()")
+        base.separator(st = 'none')        
+        base.button(l = "Mirror L->R", w = 200, c = "Locators.mirrorLocators()")
+        base.separator(st = 'none')        
+        base.button(l = "Create Joints", w = 200, c = "Joints.CreateJointsWindow()")
+        # show the actual window
+        base.showWindow()

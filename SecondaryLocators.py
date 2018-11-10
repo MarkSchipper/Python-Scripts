@@ -1,38 +1,33 @@
 import maya.cmds as base
 from math import pow, sqrt, cos, acos, radians
-
-global armTwist
-armTwist = base.intField(minValue = 2, maxValue = 10, value = 3)
-
-def CreateSecLocatorWindows():
     
+def CreateSecLocatorWindows():
+
     base.window("Secondary Controllers")
     base.rowColumnLayout(nc = 1)
     base.button(l = "Create Reverse Footroll", w = 200, c = "CreateReverseFootroll()")
     base.separator(h = 10)
-    createField()
-    base.button(l = "Create Forearm Twist", w = 200,  c = "CreateForearmTwist()")
+    base.text("Twist Amount", l = "Amount of twist joints")
+    armTwist = base.intField(minValue = 2, maxValue = 10, value = 3)
+    base.button(l = "Create Forearm Twist", w = 200,  c = "CreateForearmTwist("+str(base.intField(armTwist, query = True, value = True))+")")
     base.separator(h = 10)
     base.button(l = "Delete Locators", w = 200, c = "DeleteSecondary()")
     CheckGroup()
     base.showWindow()
 
-def createField():
-    global armTwist
-    base.text("Twist Amount", l = "Amount of twist joints")
-    armTwist = base.intField(minValue = 2, maxValue = 10, value = 3)
+    
 
 def CheckGroup():
     if base.objExists('SECONDARY'):
         print 'group exists'
     else:
         base.group(em = True, n = "SECONDARY")
-    
+
     setColors()
  
  
 def CreateReverseFootroll():
-    
+
     #ankles
     base.select(deselect = True)
     l_rev_ankle = base.spaceLocator(n = "Loc_L_INV_Heel")
@@ -84,9 +79,9 @@ def CreateReverseFootroll():
     base.scale(0.05, 0.05, 0.05, r_rev_ankle)
     base.move(-0.15, -0.4, 0, r_rev_ankle)
     base.parent(r_rev_ankle, 'Loc_R_INV_Ball')
-
     
-def CreateForearmTwist():
+        
+def CreateForearmTwist(amount):
     base.select(deselect = True)
     global armTwist
     L_elbowPos = base.xform(base.ls('Loc_L_Elbow'), q = True, t = True, ws = True)
@@ -95,8 +90,6 @@ def CreateForearmTwist():
     L_vectorY = L_wristPos[1] - L_elbowPos[1]
     L_vectorX =  L_wristPos[0] - L_elbowPos[0]
     L_vectorZ = L_wristPos[2] - L_elbowPos[2]
-
-    amount = base.intField(armTwist, query = True, value = True)
    
     for i in range(amount - 1):
 
@@ -118,7 +111,7 @@ def CreateForearmTwist():
         base.move(R_elbowPos[0] + (R_vectorX / amount) + ((R_vectorX / amount) * j), R_elbowPos[1] + (R_vectorY / amount) + ((R_vectorY / amount) * j), R_elbowPos[2] + (R_vectorZ / amount) + ((R_vectorZ / amount) * j), r_twistLoc)
         base.scale(0.05, 0.05, 0.05, r_twistLoc)
         base.parent(r_twistLoc, 'SECONDARY')
-    
+        
 def setColors():
     base.setAttr('SECONDARY.overrideEnabled', 1)
     base.setAttr('SECONDARY.overrideRGBColors', 1)
@@ -126,6 +119,3 @@ def setColors():
     
 def DeleteSecondary():
     base.delete(base.ls('SECONDARY'))    
-
-def createSecondary():
-    print 'df'
