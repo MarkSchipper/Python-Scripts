@@ -4,10 +4,11 @@ import Joints
 import SecondaryLocators
 
 # we reload all classes when this file is executed, else we would need to restart Maya after every change
-reload(Locators)
+Locators = reload(Locators)
 Joints = reload(Joints)
 SecondaryLocators = reload(SecondaryLocators)
 global selected
+global prefix
 
 class AutoRigger():
     
@@ -28,16 +29,16 @@ class AutoRigger():
         base.window("Auto Rigger")
 
         # set the layout of the window
-        base.rowColumnLayout(nc = 2, columnWidth=[(1,175), (2, 225)])
+        #base.rowColumnLayout(nc = 2, columnWidth=[(1,175), (2, 225)])
+        base.columnLayout(adj = True)
 
         settingsText = base.text('Settings', l = 'Rig Settings')
         base.separator(st = 'none')       
         base.text(l = 'Prefix', w = 100)
-        base.textField(w = 100)
+        prefix = base.textFieldGrp(w = 100, text = 'test', editable = True)
         base.text(l = "Amount of Spines", w = 100)
         spineCount = base.intField(minValue = 1, maxValue = 10, value = 4)
         spineValue = base.intField(spineCount, query = True, value = True)
-        print spineValue
         base.text(l = "Amount of Fingers", w = 100)
         fingerCount = base.intField(minValue = 0, maxValue = 10, value = 5)    
         
@@ -48,7 +49,8 @@ class AutoRigger():
         base.button(l = "Delete All Locators", w = 200, c = "Locators.deleteLocators()")
         base.separator(st = 'none')        
         base.button(l = "Mirror L->R", w = 200, c = "Locators.mirrorLocators()")
-        base.separator(st = 'none')        
-        base.button(l = "Create Joints", w = 200, c = "Joints.CreateJointsWindow()")
+        base.separator(st = 'none')    
+        base.button(l = "Joints Window", w = 200, c = "Joints.CreateJointsWindow()")
         # show the actual window
         base.showWindow()
+

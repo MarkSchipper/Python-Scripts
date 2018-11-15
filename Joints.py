@@ -4,19 +4,22 @@ import Locators
 Locators = reload(Locators)
 
 def CreateJointsWindow():
+    global setPrefix
+    setPrefix = "test"
+
     base.window("Joint Creation")
     base.rowColumnLayout(nc = 1)
     base.button(l = "Create Joints", w = 200, c = "createJoints(Locators.ReturnSpineAmount(), Locators.ReturnFingerAmount())")
     base.button(l = "Set Orientation", w = 200, c = "setJointOrientation()")
     base.button(l = "Delete Joints", w = 200, c = "deleteJoints()")
     base.showWindow()
+
+    
   
 def createJoints(spineAmount,amount):
-
     #displayLayer = base.ls('RIG', type = 'displayLayer')
     base.select(deselect = True)
-
-
+   
     if base.objExists('RIG'):
         print 'RIG already exists'
     else:
@@ -45,7 +48,7 @@ def createJoints(spineAmount,amount):
     else:
         print ''    
     createLegs()
-    
+   
     
     
 def createHead(amount):
@@ -59,7 +62,7 @@ def createHead(amount):
     base.select("RIG_Neck")
     
     jawJointStart = base.joint(radius= 0.1, p = base.xform(base.ls('Loc_Jaw_Start'), q = True, t = True, ws = True), name = 'RIG_Jaw_Start')
-    jawJointEnd = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_Jaw_End'), q = True, t = True, ws = True), name = 'Rig_Jaw_End')
+    jawJointEnd = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_Jaw_End'), q = True, t = True, ws = True), name = 'RIG_Jaw_End')
     
 def createArmJoints(amount):
     base.select(deselect = True)
