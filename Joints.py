@@ -1,7 +1,9 @@
 import maya.cmds as base
 import Locators
+import CreateIK
 
 Locators = reload(Locators)
+CreateIK = reload(CreateIK)
 
 def CreateJointsWindow():
     global setPrefix
@@ -12,6 +14,8 @@ def CreateJointsWindow():
     base.button(l = "Create Joints", w = 200, c = "createJoints(Locators.ReturnSpineAmount(), Locators.ReturnFingerAmount())")
     base.button(l = "Set Orientation", w = 200, c = "setJointOrientation()")
     base.button(l = "Delete Joints", w = 200, c = "deleteJoints()")
+    base.separator(h = 10)
+    base.button(l = "Create IK", w = 200, c = "CreateIK.IKHandles()")
     base.showWindow()
 
     
@@ -106,9 +110,7 @@ def createFinger(i):
     base.select("RIG_L_Wrist")
     allFingers = base.ls( "Loc_L_Finger_" + str(i) + "_*", type='transform')
     fingers = base.listRelatives(allFingers, p = True, s = False)
-
-    print fingers    
-    
+   
     for x, f in enumerate(allFingers):
         
         pos = base.xform(f, q = True, t = True, ws = True)

@@ -13,7 +13,6 @@ global prefix
 class AutoRigger():
     
     def __init__(self):
-        self.widgets = {}
         self.BuildUI()
        # spineValue = 0
         

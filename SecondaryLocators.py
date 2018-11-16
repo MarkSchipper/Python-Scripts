@@ -90,6 +90,8 @@ def CreateForearmTwist(amount):
     L_vectorY = L_wristPos[1] - L_elbowPos[1]
     L_vectorX =  L_wristPos[0] - L_elbowPos[0]
     L_vectorZ = L_wristPos[2] - L_elbowPos[2]
+  
+
    
     for i in range(amount - 1):
 
