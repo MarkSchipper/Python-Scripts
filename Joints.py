@@ -73,7 +73,13 @@ def createArmJoints(amount):
     base.select("RIG_SPINE_"+str(amount - 1))
     L_Clavicle = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_Clavicle'), q = True, t = True, ws = True), name = "RIG_L_Clavicle")
     L_UpperArmJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_UpperArm'), q = True, t = True, ws = True), name = "RIG_L_UpperArm")
-    L_ElbowJoint = base.joint(radius = 0.1, p = base.xform(base.ls("Loc_L_Elbow"), q = True, t = True, ws = True), name = "RIG_L_Elbow")
+    
+    if(base.objExists('Loc_L_Elbow_2')):
+        L_ElbowJoint = base.joint(radius = 0.1, p = base.xform(base.ls("Loc_L_Elbow_1"), q = True, t = True, ws = True), name = "RIG_L_Elbow_1")   
+        L_ElbowJoint = base.joint(radius = 0.1, p = base.xform(base.ls("Loc_L_Elbow_2"), q = True, t = True, ws = True), name = "RIG_L_Elbow_2")   
+    else:    
+        L_ElbowJoint = base.joint(radius = 0.1, p = base.xform(base.ls("Loc_L_Elbow"), q = True, t = True, ws = True), name = "RIG_L_Elbow")
+    
     if (base.objExists('Loc_L_ArmTwist_*')):
         L_armTwists = base.ls('Loc_L_ArmTwist_*', type = 'transform')
         print L_armTwists
@@ -88,7 +94,14 @@ def createArmJoints(amount):
     
     R_Clavicle = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_Clavicle'), q = True, t = True, ws = True), name = "RIG_R_Clavicle")
     R_UpperArmJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_UpperArm'), q = True, t = True, ws = True), name = "RIG_R_UpperArm")
-    R_ElbowJoint = base.joint(radius = 0.1, p = base.xform(base.ls("Loc_R_Elbow"), q = True, t = True, ws = True), name = "RIG_R_Elbow")
+
+    if(base.objExists('Loc_R_Elbow_2')):
+        R_ElbowJoint = base.joint(radius = 0.1, p = base.xform(base.ls("Loc_R_Elbow_1"), q = True, t = True, ws = True), name = "RIG_R_Elbow_1")   
+        R_ElbowJoint = base.joint(radius = 0.1, p = base.xform(base.ls("Loc_R_Elbow_2"), q = True, t = True, ws = True), name = "RIG_R_Elbow_2")   
+    else:    
+        R_ElbowJoint = base.joint(radius = 0.1, p = base.xform(base.ls("Loc_R_Elbow"), q = True, t = True, ws = True), name = "RIG_R_Elbow")
+
+    
     if (base.objExists('Loc_R_ArmTwist_*')):
         R_armTwists = base.ls('Loc_R_ArmTwist_*', type = 'transform')
         for j, at in enumerate(R_armTwists):
@@ -97,7 +110,7 @@ def createArmJoints(amount):
         print ''
     R_WristJoint = base.joint(radius = 0.1, p = base.xform(base.ls("Loc_R_Wrist"), q = True, t = True, ws = True), name = "RIG_R_Wrist")
     
-    
+
     
 def createFingerJoints(amount):
     for x in range(0, amount):
@@ -137,7 +150,8 @@ def createLegs():
     
     L_upperLegJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_UpperLeg', type = 'transform'), q = True, t = True, ws = True), name = "RIG_L_UpperLeg")
     L_KneeJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_LowerLeg'), q = True, t = True, ws = True), name = 'RIG_L_LowerLeg')   
-    L_FootJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_Foot') , q = True, t = True, ws = True), name = 'RIG_L_Foot') 
+    L_FootJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_Foot') , q = True, t = True, ws = True), name = 'RIG_L_Foot')     
+    L_FootBallJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_FootBall') , q = True, t = True, ws = True), name = 'RIG_L_FootBall') 
     L_ToeJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_L_Toes'), q = True, t = True, ws = True), name = 'RIG_L_Toes')
     
     ## 
@@ -146,7 +160,8 @@ def createLegs():
 
     R_upperLegJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_UpperLeg', type = 'transform'), q = True, t = True, ws = True), name = "RIG_R_UpperLeg")
     R_KneeJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_LowerLeg'), q = True, t = True, ws = True), name = 'RIG_R_LowerLeg')  
-    R_FootJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_Foot'), q = True, t = True, ws = True)  , name = 'RIG_R_Foot') 
+    L_FootJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_Foot') , q = True, t = True, ws = True), name = 'RIG_R_Foot')     
+    R_FootBallJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_FootBall'), q = True, t = True, ws = True)  , name = 'RIG_R_FootBall') 
     R_ToeJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_R_Toes'), q = True, t = True, ws = True), name = 'RIG_R_Toes')
 
 def createInverseFootRoll():

@@ -32,52 +32,56 @@ def CreateReverseFootroll():
     base.select(deselect = True)
     l_rev_ankle = base.spaceLocator(n = "Loc_L_INV_Heel")
     base.scale(0.05, 0.05, 0.05, l_rev_ankle)
-    base.move(0.15, -0.5, 0, l_rev_ankle)
+    base.move(0.15, 0, 0, l_rev_ankle)
     base.parent(l_rev_ankle, 'SECONDARY')
     
     r_rev_ankle = base.spaceLocator(n = "Loc_R_INV_Heel")
     base.scale(0.05, 0.05, 0.05, r_rev_ankle)
-    base.move(-0.15, -0.5, 0, r_rev_ankle)
+    base.move(-0.15, 0, 0, r_rev_ankle)
     base.parent(r_rev_ankle, 'SECONDARY')
 
 
     # toes
+    l_toeLoc = base.xform(base.ls("Loc_L_Toes"), q = True, t = True, ws = True)
     l_rev_toes = base.spaceLocator(n = 'Loc_L_INV_Toes')
     base.scale(0.05, 0.05, 0.05, l_rev_toes) 
-    base.move(0.15, -0.5, 0.3, l_rev_toes)
+    base.move(l_toeLoc[0], l_toeLoc[1], l_toeLoc[2], l_rev_toes)
     base.parent(l_rev_toes, 'Loc_L_INV_Heel')
     
     # toes
+    r_toeLoc = base.xform(base.ls("Loc_R_Toes"), q = True, t = True, ws = True)
     r_rev_toes = base.spaceLocator(n = 'Loc_R_INV_Toes')
     base.scale(0.05, 0.05, 0.05, r_rev_toes) 
-    base.move(-0.15, -0.5, 0.3, r_rev_toes)
+    base.move(r_toeLoc[0],r_toeLoc[1], r_toeLoc[2], r_rev_toes)
     base.parent(r_rev_toes, 'Loc_R_INV_Heel')
     
     #foot ball    
+    l_ballLoc = base.xform(base.ls("Loc_L_FootBall"), q = True, t = True, ws = True)    
     l_rev_ball = base.spaceLocator(n = 'Loc_L_INV_Ball')
     base.scale(0.05, 0.05, 0.05, l_rev_ball)
-    base.move(0.15, -0.5, 0.15, l_rev_ball)
+    base.move(l_ballLoc[0], l_ballLoc[1], l_ballLoc[2], l_rev_ball)
     base.parent(l_rev_ball, 'Loc_L_INV_Toes')
     
     #foot ball
-    
+    r_ballLoc = base.xform(base.ls("Loc_R_FootBall"), q = True, t = True, ws = True)    
     r_rev_ball = base.spaceLocator(n = 'Loc_R_INV_Ball')
     base.scale(0.05, 0.05, 0.05, r_rev_ball)
-    base.move(-0.15, -0.5, 0.15, r_rev_ball)
+    base.move(r_ballLoc[0], r_ballLoc[1], r_ballLoc[2], r_rev_ball)
     base.parent(r_rev_ball, 'Loc_R_INV_Toes')
     
     #ankle
-    
+
+    l_ankleLoc = base.xform(base.ls("Loc_L_Foot"), q = True, t = True, ws = True)
     l_rev_ankle = base.spaceLocator(n = 'Loc_L_INV_Ankle')
     base.scale(0.05, 0.05, 0.05, l_rev_ankle)
-    base.move(0.15, -0.4, 0, l_rev_ankle)
+    base.move(l_ankleLoc[0], l_ankleLoc[1],l_ankleLoc[2], l_rev_ankle)
     base.parent(l_rev_ankle, 'Loc_L_INV_Ball')
     
      #anklez
-    
+    r_ankleLoc = base.xform(base.ls("Loc_R_Foot"), q = True, t = True, ws = True)    
     r_rev_ankle = base.spaceLocator(n = 'Loc_R_INV_Ankle')
     base.scale(0.05, 0.05, 0.05, r_rev_ankle)
-    base.move(-0.15, -0.4, 0, r_rev_ankle)
+    base.move(r_ankleLoc[0], r_ankleLoc[1], r_ankleLoc[2], r_rev_ankle)
     base.parent(r_rev_ankle, 'Loc_R_INV_Ball')
     
         
