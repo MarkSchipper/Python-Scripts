@@ -80,13 +80,20 @@ def createSpine():
     setColors()
     
 def createHead():
-    neck = base.spaceLocator(n = 'Loc_Neck')
+    neck = base.spaceLocator(n = 'Loc_Neck_Start')
     base.parent(neck, 'Loc_SPINE_' + str(ReturnSpineAmount() - 1))
     base.scale(1,1, 1, neck)
-    base.move(0,1.75 + (0.25 * ReturnSpineAmount()), 0, neck)  
+    base.move(0,1.6 + (0.25 * ReturnSpineAmount()), 0, neck) 
+    
+    neck = base.spaceLocator(n = 'Loc_Neck_End')
+    base.parent(neck, 'Loc_Neck_Start')
+    base.scale(1,1, 1, neck)
+    base.move(0,1.75 + (0.25 * ReturnSpineAmount()), 0, neck) 
+    
+     
     
     head = base.spaceLocator(n = 'Loc_Head')
-    base.parent(head, 'Loc_Neck')
+    base.parent(head, 'Loc_Neck_End')
     base.scale(1,1,1, head)
     base.move(0, 2 + (0.25 * spineCount),0, head)  
     
@@ -337,15 +344,13 @@ def setColors():
 
  
 def mirrorLocators():
-    allLeftLocators = base.ls("Loc_L_*")
-    leftLocators = base.listRelatives(*allLeftLocators, p = True, f = True)
-
-    allRightLocators = base.ls("Loc_R_*")
-    rightLocators = base.listRelatives(*allRightLocators, p = True, f = True)
-    
-    for i,l in enumerate(leftLocators):
+    allLeftLocators = base.ls("Loc_L_*", type = 'transform')
+    allRightLocators = base.ls("Loc_R_*", type = 'transform')
+     
+    for i,l in enumerate(allLeftLocators):
         pos = base.xform(l, q = True, t=True, ws = True)
-        base.move(-pos[0], pos[1], pos[2], rightLocators[i])
+        
+        base.move(-pos[0], pos[1], pos[2], allRightLocators[i])
             
 def deleteLocators():
     nodes = base.ls("Loc_*")

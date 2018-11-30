@@ -59,11 +59,12 @@ def createHead(amount):
     base.select(deselect = True)
     base.select("RIG_SPINE_"+str(amount - 1))   
     
-    neckJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_Neck'), q = True, t = True, ws = True), name = "RIG_Neck")
+    neckJoint = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_Neck_Start'), q = True, t = True, ws = True), name = "RIG_Neck_Start")
+    base.joint(radius = 0.1, p = base.xform(base.ls('Loc_Neck_End'), q = True, t = True, ws = True), name = "RIG_Neck_End")
     base.joint(radius = 0.1, p = base.xform(base.ls('Loc_Head'), q = True, t = True, ws = True), name = "RIG_Head")
     
     base.select(deselect = True)
-    base.select("RIG_Neck")
+    base.select("RIG_Neck_End")
     
     jawJointStart = base.joint(radius= 0.1, p = base.xform(base.ls('Loc_Jaw_Start'), q = True, t = True, ws = True), name = 'RIG_Jaw_Start')
     jawJointEnd = base.joint(radius = 0.1, p = base.xform(base.ls('Loc_Jaw_End'), q = True, t = True, ws = True), name = 'RIG_Jaw_End')
@@ -140,7 +141,7 @@ def createFinger(i):
     for y, g in enumerate(r_allFingers):
         
         r_pos = base.xform(g, q = True, t = True, ws = True)
-        r_j = base.joint(radius = 0.1, p = r_pos, name = "RIG_L_Finger_"+str(i)+"_"+str(y))    
+        r_j = base.joint(radius = 0.1, p = r_pos, name = "RIG_R_Finger_"+str(i)+"_"+str(y))    
         
         
         
@@ -185,7 +186,7 @@ def createInverseFootRoll():
 def setJointOrientation():
 
     base.select('RIG_ROOT')
-    base.joint(e = True, ch = True, oj = 'xyz')    
+    base.joint(e = True, ch = True, oj = 'xyz', secondaryAxisOrient = 'yup')    
       
 def deleteJoints():
     base.select(deselect = True)

@@ -3,12 +3,14 @@ import Locators
 import Joints
 import SecondaryLocators
 import Controller
+import Constraints
 
 # we reload all classes when this file is executed, else we would need to restart Maya after every change
 Locators = reload(Locators)
 Joints = reload(Joints)
 SecondaryLocators = reload(SecondaryLocators)
 Controller = reload(Controller)
+Constraints = reload(Constraints)
 
 global selected
 global prefix
@@ -56,7 +58,9 @@ class AutoRigger():
         base.separator(st = 'none')    
         base.button(l = "Joints Window", w = 200, c = "Joints.CreateJointsWindow()")
         base.separator(st = 'none')    
-        base.button(l = "Controllers", w = 200, c = "Controller.CreateController()")
+        base.button(l = "Controllers", w = 200, c = "Controller.CreateController("+str(base.intField(spineCount, query = True, value = True))+","+str(base.intField(fingerCount, query = True, value = True))+")")
+        base.separator(st = 'none')    
+        base.button(l = "Add Constraints", w = 200, c = "Constraints.CreateConstraints()")
         # show the actual window
         base.showWindow()
 
