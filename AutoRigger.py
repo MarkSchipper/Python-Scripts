@@ -60,7 +60,7 @@ class AutoRigger():
         base.separator(st = 'none')    
         base.button(l = "Controllers", w = 200, c = "Controller.CreateController("+str(base.intField(spineCount, query = True, value = True))+","+str(base.intField(fingerCount, query = True, value = True))+")")
         base.separator(st = 'none')    
-        base.button(l = "Add Constraints", w = 200, c = "Constraints.CreateConstraints()")
+        base.button(l = "Add Constraints", w = 200, c = "Constraints.CreateConstraints("+str(base.intField(fingerCount, query = True, value = True))+")")
         # show the actual window
         base.showWindow()
 

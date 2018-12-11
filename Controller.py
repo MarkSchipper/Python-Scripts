@@ -36,7 +36,9 @@ def CreateWrists():
 
     #left
     L_wrist_ctrl = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_L_Wrist")
+    base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)
     l_selection = base.select("CTRL_L_Wrist.cv[1]","CTRL_L_Wrist.cv[3]","CTRL_L_Wrist.cv[5]","CTRL_L_Wrist.cv[7]","CTRL_L_Wrist.cv[9]","CTRL_L_Wrist.cv[11]","CTRL_L_Wrist.cv[13]","CTRL_L_Wrist.cv[15]")
+    
     base.scale(0.7, 0.7, 0.7, l_selection)
     base.scale(0.15, 0.15, 0.15, L_wrist_ctrl)
     
@@ -51,7 +53,9 @@ def CreateWrists():
     
     #right
     R_wrist_ctrl = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_R_Wrist")
+    base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)    
     r_selection = base.select("CTRL_R_Wrist.cv[1]","CTRL_R_Wrist.cv[3]","CTRL_R_Wrist.cv[5]","CTRL_R_Wrist.cv[7]","CTRL_R_Wrist.cv[9]","CTRL_R_Wrist.cv[11]","CTRL_R_Wrist.cv[13]","CTRL_L_Wrist.cv[15]")
+    
     base.scale(0.7, 0.7, 0.7, r_selection)
     base.scale(0.15, 0.15, 0.15, R_wrist_ctrl)
     
@@ -122,8 +126,8 @@ def CreateHead():
     base.makeIdentity(head, apply = True, t = 1, r = 1, s = 1)    
         
 def CreateFeet():
-    l_arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1)            
-    r_arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1)                    
+    l_arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1, name = "CTRL_L_Foot")            
+    r_arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1, name = "CTRL_R_Foot")                    
     
     base.scale(0.1, 0.1, 0.1, l_arrow)
     base.scale(0.1, 0.1, 0.1, r_arrow)
@@ -153,7 +157,7 @@ def CreateFingers(fingerCount):
             base.scale(0.2, 0.2, 0.2, finger)    
             base.move(fingerPos[0], fingerPos[1], fingerPos[2], finger)
             base.rotate(80,0,125, finger)
-                     
+        base.makeIdentity(finger, apply = True, t = 1, r = 1, s = 1)              
         base.parent(finger, "CTRL_L_Wrist")
         
     for k in range(0, fingerCount):
@@ -168,7 +172,7 @@ def CreateFingers(fingerCount):
             base.scale(0.2, 0.2, 0.2, finger)    
             base.move(fingerPos[0], fingerPos[1], fingerPos[2], finger)
             base.rotate(80,0,-125, finger)
-                     
+        base.makeIdentity(finger, apply = True, t = 1, r = 1, s = 1)              
         base.parent(finger, "CTRL_R_Wrist")
         
 def setColors():

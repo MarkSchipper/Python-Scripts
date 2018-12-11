@@ -8,7 +8,7 @@ def CreateSecLocatorWindows():
     base.button(l = "Create Reverse Footroll", w = 200, c = "CreateReverseFootroll()")
     base.separator(h = 10)
     base.text("Twist Amount", l = "Amount of twist joints")
-    armTwist = base.intField(minValue = 2, maxValue = 10, value = 3)
+    armTwist = base.intField(minValue = 2, maxValue = 10, value = 4)
     base.button(l = "Create Forearm Twist", w = 200,  c = "CreateForearmTwist("+str(base.intField(armTwist, query = True, value = True))+")")
     base.separator(h = 10)
     base.button(l = "Delete Locators", w = 200, c = "DeleteSecondary()")
@@ -86,6 +86,7 @@ def CreateReverseFootroll():
     
         
 def CreateForearmTwist(amount):
+    print amount
     base.select(deselect = True)
     global armTwist
     L_elbowPos = base.xform(base.ls('Loc_L_Elbow'), q = True, t = True, ws = True)

@@ -60,5 +60,5 @@ def IKHandles():
             base.parent(c, "Cluster_"+str(k - 1)+"_Handle")
     
     
-    base.ikHandle(n = "IK_Spine", sj = "RIG_ROOT", ee = "RIG_SPINE_" + str(Locators.ReturnSpineAmount() - 1), sol = 'ikSplineSolver', c = 'SpineCurve')    
+    base.ikHandle(n = "IK_Spine", sj = "RIG_ROOT", ee = "RIG_SPINE_" + str(Locators.ReturnSpineAmount() - 1), sol = 'ikSplineSolver', c = 'SpineCurve', ccv = False)    
         
