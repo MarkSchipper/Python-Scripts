@@ -19,7 +19,7 @@ def CreateMaster():
     master_ctrl = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "MASTER_CONTROLLER")
     selection = base.select("MASTER_CONTROLLER.cv[1]","MASTER_CONTROLLER.cv[3]","MASTER_CONTROLLER.cv[5]","MASTER_CONTROLLER.cv[7]","MASTER_CONTROLLER.cv[9]","MASTER_CONTROLLER.cv[11]","MASTER_CONTROLLER.cv[13]","MASTER_CONTROLLER.cv[15]")
     base.scale(0.7, 0.7, 0.7, selection)
-    base.scale(2, 2, 2, master_ctrl)
+    base.scale(1, 1, 1, master_ctrl)
 
     base.makeIdentity(master_ctrl, apply = True, t = 1, r = 1, s = 1)
     
@@ -28,7 +28,7 @@ def CreatePelvis():
     pelvis_ctrl = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 8, name = "CTRL_PELVIS")
     rootPos = base.xform(base.ls("RIG_ROOT", type = 'joint'), q = True, t = True, ws = True)
     base.move(rootPos[0],rootPos[1],rootPos[2], pelvis_ctrl) 
-    base.scale(0.5, 0.5, 0.5, pelvis_ctrl)   
+    base.scale(0.3, 0.3, 0.3, pelvis_ctrl)   
     base.makeIdentity(pelvis_ctrl, apply = True, t = 1, r = 1, s = 1)  
     base.parent(pelvis_ctrl, "MASTER_CONTROLLER")       
     
@@ -40,7 +40,7 @@ def CreateWrists():
     l_selection = base.select("CTRL_L_Wrist.cv[1]","CTRL_L_Wrist.cv[3]","CTRL_L_Wrist.cv[5]","CTRL_L_Wrist.cv[7]","CTRL_L_Wrist.cv[9]","CTRL_L_Wrist.cv[11]","CTRL_L_Wrist.cv[13]","CTRL_L_Wrist.cv[15]")
     
     base.scale(0.7, 0.7, 0.7, l_selection)
-    base.scale(0.15, 0.15, 0.15, L_wrist_ctrl)
+    base.scale(0.1, 0.1, 0.1, L_wrist_ctrl)
     
     l_wristPos = base.xform(base.ls("RIG_L_Wrist"), q = True, t = True, ws = True)
     l_wristRot = base.joint(base.ls("RIG_L_Wrist"), q = True, o = True)
@@ -57,7 +57,7 @@ def CreateWrists():
     r_selection = base.select("CTRL_R_Wrist.cv[1]","CTRL_R_Wrist.cv[3]","CTRL_R_Wrist.cv[5]","CTRL_R_Wrist.cv[7]","CTRL_R_Wrist.cv[9]","CTRL_R_Wrist.cv[11]","CTRL_R_Wrist.cv[13]","CTRL_L_Wrist.cv[15]")
     
     base.scale(0.7, 0.7, 0.7, r_selection)
-    base.scale(0.15, 0.15, 0.15, R_wrist_ctrl)
+    base.scale(0.1, 0.1, 0.1, R_wrist_ctrl)
     
     r_wristPos = base.xform(base.ls("RIG_R_Wrist"), q = True, t = True, ws = True)
     r_wristRot = base.joint(base.ls("RIG_R_Wrist"), q = True, o = True)
@@ -73,8 +73,8 @@ def CreateClavicles(spineCount):
     l_clavicle = base.curve(p = [(1,0,0),(1,1,1), (1,1.5,2), (1,1.7,3), (1,1.5,4), (1,1,5), (1,0,6), (-1, 0,6), (-1,1,5), (-1,1.5,4), (-1,1.7,3), (-1,1.5,2), (-1,1,1), (-1,0,0) ], degree = 1, name = "CTRL_L_Clavicle")
     r_clavicle = base.curve(p = [(1,0,0),(1,1,1), (1,1.5,2), (1,1.7,3), (1,1.5,4), (1,1,5), (1,0,6), (-1, 0,6), (-1,1,5), (-1,1.5,4), (-1,1.7,3), (-1,1.5,2), (-1,1,1), (-1,0,0) ], degree = 1, name = "CTRL_R_Clavicle")
     
-    base.scale(0.05, 0.05, 0.05, l_clavicle)    
-    base.scale(0.05, 0.05, 0.05, r_clavicle)  
+    base.scale(0.02, 0.02, 0.02, l_clavicle)    
+    base.scale(0.02, 0.02, 0.02, r_clavicle)  
     
     l_ArmPos = base.xform(base.ls("RIG_L_UpperArm"), q = True, t = True, ws = True)  
     r_ArmPos = base.xform(base.ls("RIG_R_UpperArm"), q = True, t = True, ws = True)
@@ -100,6 +100,7 @@ def CreateSpines(spineCount):
         spinePos = base.xform(base.ls("RIG_SPINE_"+str(i)), q = True, t = True, ws = True)
         spine = base.curve(p =[(0, spinePos[1], spinePos[2]), (0, spinePos[1], spinePos[2] - 1), (0, spinePos[1] + 0.1, spinePos[2] - 1.1), (0, spinePos[1] + 0.1, spinePos[2] - 1.4), (0, spinePos[1] - 0.1, spinePos[2] - 1.4), (0, spinePos[1] - 0.1, spinePos[2] - 1.1), (0, spinePos[1], spinePos[2] - 1)], degree = 1, name = "CTRL_SPINE_"+str(i))
         base.move(spinePos[0], spinePos[1], spinePos[2], spine+".scalePivot", spine+".rotatePivot")
+        base.scale(0.5, 0.5, 0.5, spine)
         if (i == 0):
             base.parent(spine, "CTRL_PELVIS")
         else:
@@ -108,7 +109,7 @@ def CreateSpines(spineCount):
 def CreateNeck(spineCount):
     neck = base.curve(p = [(0.5,0,0), (0.25, -0.25, -0.5), (-0.25, -0.25, -0.5), (-0.5,0,0), (-0.25, -0.25, 0.5), (0.25, -0.25, 0.5), (0.5, 0,0)], degree = 1, name = "CTRL_NECK")
     neckPos = base.xform(base.ls("RIG_Neck_Start"), q = True, t = True, ws = True)
-    base.scale(0.5, 0.5, 0.5, neck)
+    base.scale(0.3, 0.3, 0.3, neck)
     base.move(neckPos[0], neckPos[1]+0.1, neckPos[2], neck)
     base.move(neckPos[0], neckPos[1], neckPos[2], neck+".scalePivot", neck+".rotatePivot")
     base.parent(neck, "CTRL_SPINE_"+str(spineCount-1))
@@ -117,20 +118,39 @@ def CreateNeck(spineCount):
  
 def CreateHead():    
     head = base.curve(p = [(0.5,0,0), (0.25,-0.25,-0.5), (0.25,-0.5, -0.5), (0,-0.6,-0.5),(-0.25,-0.5,-0.5), (-0.25, -0.25, -0.5), (-0.5,0,0), (-0.25, -0.25, 0.5), (-0.25, -0.5, 0.5), (0,-0.6, 0.5) ,(0.25, -0.5, 0.5),(0.25, -0.25, 0.5), (0.5,0,0)], degree = 1, name = "CTRL_HEAD")
-    base.scale(0.5, 0.5, 0.5, head)
+    base.scale(0.3, 0.3, 0.3, head)
     headPos = base.xform(base.ls("RIG_Head"), q= True, t = True, ws = True)
     neckPos = base.xform(base.ls("RIG_Neck_End"), q = True, t = True, ws = True)
     base.move(headPos[0], headPos[1], headPos[2], head)
     base.move(neckPos[0], neckPos[1], neckPos[2], head+".scalePivot", head+".rotatePivot")    
     base.parent(head, "CTRL_NECK")
     base.makeIdentity(head, apply = True, t = 1, r = 1, s = 1)    
+    
+    #jaw
+    jaw = base.curve(p = [(0,0,0),(0.1, 0.1, 0), (0, 0.2,0), (-0.1, 0.1,0), (0,0,0)], degree = 1, name = "CTRL_JAW")
+    base.move(0, 0.1, 0, jaw+".scalePivot", jaw+".rotatePivot")
+    base.scale(0.3, 0.3, 0.3, jaw)
+    jawPos = base.xform(base.ls("RIG_Jaw_End"), q = True, t = True, ws = True)
+    jawStart = base.xform(base.ls("RIG_Jaw_Start"), q = True, t = True, ws = True)
+    base.move(jawPos[0], jawPos[1] - 0.1, jawPos[2] + 0.1, jaw)
+    base.move(jawStart[0], jawStart[1], jawStart[2], jaw+".scalePivot", jaw+".rotatePivot")
+    base.parent(jaw, "CTRL_HEAD")
+    base.makeIdentity(jaw, apply = True, t = 1, r = 1, s = 1)    
+    
         
 def CreateFeet():
-    l_arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1, name = "CTRL_L_Foot")            
-    r_arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1, name = "CTRL_R_Foot")                    
+    l_arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1, name = "CTRL_L_Foot")
+    base.addAttr(shortName = "KF", longName = "Knee_Twist", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)            
+    base.addAttr(shortName = "KR", longName = "Knee_Fix", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)            
+    base.addAttr(shortName = "FR", longName = "Foot_Roll", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)            
+
+    r_arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1, name = "CTRL_R_Foot")
+    base.addAttr(shortName = "KF", longName = "Knee_Twist", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)            
+    base.addAttr(shortName = "KR", longName = "Knee_Fix", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)            
+    base.addAttr(shortName = "FR", longName = "Foot_Roll", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)                            
     
-    base.scale(0.1, 0.1, 0.1, l_arrow)
-    base.scale(0.1, 0.1, 0.1, r_arrow)
+    base.scale(0.08, 0.08, 0.08, l_arrow)
+    base.scale(0.08, 0.08, 0.08, r_arrow)
         
     l_footPos = base.xform(base.ls("RIG_L_Foot"), q = True, t = True, ws = True)
     r_footPos = base.xform(base.ls("RIG_R_Foot"), q = True, t = True, ws = True)  
@@ -154,7 +174,7 @@ def CreateFingers(fingerCount):
         for j, fi in enumerate(allFingers):
             fingerPos = base.xform(fi, q = True, t = True, ws = True)
             fingerRot = base.joint(fi, q = True, o = True)
-            base.scale(0.2, 0.2, 0.2, finger)    
+            base.scale(0.1, 0.1, 0.1, finger)    
             base.move(fingerPos[0], fingerPos[1], fingerPos[2], finger)
             base.rotate(80,0,125, finger)
         base.makeIdentity(finger, apply = True, t = 1, r = 1, s = 1)              
@@ -169,7 +189,7 @@ def CreateFingers(fingerCount):
         for l, fi in enumerate(allFingers):
             fingerPos = base.xform(fi, q = True, t = True, ws = True)
             fingerRot = base.joint(fi, q = True, o = True)
-            base.scale(0.2, 0.2, 0.2, finger)    
+            base.scale(0.1, 0.1, 0.1, finger)    
             base.move(fingerPos[0], fingerPos[1], fingerPos[2], finger)
             base.rotate(80,0,-125, finger)
         base.makeIdentity(finger, apply = True, t = 1, r = 1, s = 1)              

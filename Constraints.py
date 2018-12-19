@@ -1,6 +1,6 @@
 import maya.cmds as base
 
-def CreateConstraints(fingerCount):
+def CreateConstraints(fingerCount, spineAmount):
     
     #left
     l_wristCtrl = base.ls("CTRL_L_Wrist", type = 'transform')
@@ -21,11 +21,13 @@ def CreateConstraints(fingerCount):
     base.orientConstraint(r_wristCtrl, r_wristJoint, mo = True)    
     base.connectAttr("CTRL_R_Wrist.Elbow_PV", "IK_R_Arm.twist") 
     
-    base.orientConstraint("CTRL_L_Clavicle", "RIG_L_Clavicle")
-    base.orientConstraint("CTRL_R_Clavicle", "RIG_R_Clavicle")
+    base.orientConstraint("CTRL_L_Clavicle", "RIG_L_Clavicle", mo = True)
+    base.orientConstraint("CTRL_R_Clavicle", "RIG_R_Clavicle", mo = True)
+    base.orientConstraint("CTRL_NECK", "RIG_Neck_Start", mo = True)
+    base.orientConstraint("CTRL_HEAD", "RIG_Neck_End", mo = True)
+    base.orientConstraint("CTRL_JAW", "RIG_Jaw_Start", mo = True)
     
-    
-    base.orientConstraint("CTRL_NECK", "RIG_Neck_Start")
+    base.connectAttr("CTRL_SPINE_"+str(spineAmount - 1)+".rotateY", "IK_Spine.twist")
     
     if base.objExists("RIG_L_ArmTwist_0"):
         l_twistJoints = base.ls("RIG_L_ArmTwist_*")
@@ -71,16 +73,73 @@ def CreateConstraints(fingerCount):
         for m, r_finger in enumerate(r_allFingers):
             base.connectAttr("CTRL_R_Finger_"+str(k)+".rotateZ", r_finger+".rotateZ")        
         
+    if base.objExists("RIG_L_INV_Heel"):
+        base.pointConstraint("RIG_L_INV_Toes", "IK_L_Toes", mo = True)
+        base.pointConstraint("RIG_L_INV_Ball", "IK_L_FootBall", mo = True)
+        base.pointConstraint("RIG_L_INV_Ankle", "IK_L_Leg", mo = True)
         
+        base.pointConstraint("RIG_R_INV_Toes", "IK_R_Toes", mo = True)
+        base.pointConstraint("RIG_R_INV_Ball", "IK_R_FootBall", mo = True)
+        base.pointConstraint("RIG_R_INV_Ankle", "IK_R_Leg", mo = True)
         
+        base.pointConstraint("CTRL_L_Foot", "RIG_L_INV_Heel", mo = True)
+        base.orientConstraint("CTRL_L_Foot", "RIG_L_INV_Heel", mo = True)
         
+        base.pointConstraint("CTRL_R_Foot", "RIG_R_INV_Heel", mo = True)
+        base.orientConstraint("CTRL_R_Foot", "RIG_R_INV_Heel", mo = True)
         
+    else:
+        base.parent("IK_L_Toes", "IK_L_FootBall")
+        base.parent("IK_L_FootBall", "IK_L_Leg")              
         
+        base.parent("IK_R_Toes", "IK_R_FootBall")
+        base.parent("IK_R_FootBall", "IK_R_Leg")        
         
+        base.pointConstraint("CTRL_R_Foot", "IK_R_Leg", mo = True)
+        base.orientConstraint("CTRL_R_Foot", "IK_R_Leg", mo = True)
         
+        base.pointConstraint("CTRL_L_Foot", "IK_L_Leg", mo = True)
+        base.orientConstraint("CTRL_L_Foot", "IK_L_Leg", mo = True)
         
+    
+    #feet constraints    
+    
+    #lleft
+    base.setAttr("IK_L_Leg.poleVectorX", 1)
+    base.setAttr("IK_L_Leg.poleVectorZ", 0)
+    l_footAverage = base.shadingNode("plusMinusAverage", asUtility = True, n = "L_Foot_Node") 
+    base.setAttr(l_footAverage+".operation", 2)   
+    base.connectAttr("CTRL_L_Foot.Knee_Fix", l_footAverage+".input1D[0]")
+    base.connectAttr("CTRL_L_Foot.Knee_Twist", l_footAverage+".input1D[1]")  
+    base.connectAttr(l_footAverage+".output1D", "IK_L_Leg.twist")  
+    base.setAttr("CTRL_L_Foot.Knee_Fix", 90)
+    
+    #right
+    base.setAttr("IK_R_Leg.poleVectorX", 1)
+    base.setAttr("IK_R_Leg.poleVectorZ", 0)
+    r_footAverage = base.shadingNode("plusMinusAverage", asUtility = True, n = "R_Foot_Node") 
+    base.setAttr(r_footAverage+".operation", 2)   
+    base.connectAttr("CTRL_R_Foot.Knee_Fix", r_footAverage+".input1D[0]")
+    base.connectAttr("CTRL_R_Foot.Knee_Twist", r_footAverage+".input1D[1]")  
+    base.connectAttr(r_footAverage+".output1D", "IK_R_Leg.twist")  
+    base.setAttr("CTRL_R_Foot.Knee_Fix", 90)
         
-        
+
+def BindSkin():
+    sel = base.ls(sl = True)
+    if (len(sel) == 0):
+        base.confirmDialog(title = "Empty Selection", message = "You have to select a mesh", button = ['Ok'])
+    else:
+        base.skinCluster(sel[0], "RIG_ROOT", bm = 3, sm = 1, dr = 0.1)
+        base.geomBind('skinCluster1', bm = 3, gvp = [256, 1])   
+     
+    _rig = base.select("RIG")    
+    base.createDisplayLayer(nr = True, name = "RIG_LAYER")        
+    _ik = base.ls("IK_*")
+    base.editDisplayLayerMembers("RIG_LAYER", _ik)
+    
+    _ctrl = base.select("MASTER_CONTROLLER")
+    base.createDisplayLayer(nr = True, name = "CONTROLLERS")
         
         
         

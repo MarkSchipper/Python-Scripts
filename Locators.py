@@ -12,8 +12,8 @@ def createFields(spineValue, fingerValue):
     
     print spineValue
     
-    spineCount = 4
-    fingerCount = 5
+    #spineCount = 4
+    #fingerCount = 5
     #spineCount = spineValue
     #fingerCount = fingerValue
     
@@ -40,6 +40,8 @@ def CreateLocators(spineValue, fingerValue, doubleElbow):
 
     spineCount = spineValue
     fingerCount = fingerValue
+    
+    print spineCount
     
     # Check if the object 'Loc_Master' exists, if it does do nothing
     # else create an empty ( em = True ) group and name it          
@@ -125,7 +127,7 @@ def createLegs(side):
         ## lower leg
         lowerLeg = base.spaceLocator(n = 'Loc_L_LowerLeg')
         base.scale(0.1,0.1,0.1, lowerLeg)
-        base.move(0.15,0.75, 0, lowerLeg)
+        base.move(0.15,0.75, 0.05, lowerLeg)
         base.parent(lowerLeg, 'Loc_L_UpperLeg')
         
         ## foot
@@ -165,7 +167,7 @@ def createLegs(side):
         
         lowerLeg = base.spaceLocator(n = 'Loc_R_LowerLeg')
         base.scale(0.1,0.1,0.1, lowerLeg)
-        base.move(-0.15, 0.75, 0, lowerLeg)
+        base.move(-0.15, 0.75, 0.05, lowerLeg)
         base.parent(lowerLeg, 'Loc_R_UpperLeg')
         
         # foot

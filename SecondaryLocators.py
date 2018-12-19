@@ -5,13 +5,13 @@ def CreateSecLocatorWindows():
 
     base.window("Secondary Controllers")
     base.rowColumnLayout(nc = 1)
-    base.button(l = "Create Reverse Footroll", w = 200, c = "CreateReverseFootroll()")
+    base.button(l = "Create Reverse Footroll", w = 200, c = "SecondaryLocators.CreateReverseFootroll()")
     base.separator(h = 10)
     base.text("Twist Amount", l = "Amount of twist joints")
     armTwist = base.intField(minValue = 2, maxValue = 10, value = 4)
-    base.button(l = "Create Forearm Twist", w = 200,  c = "CreateForearmTwist("+str(base.intField(armTwist, query = True, value = True))+")")
+    base.button(l = "Create Forearm Twist", w = 200,  c = "SecondaryLocators.CreateForearmTwist("+str(base.intField(armTwist, query = True, value = True))+")")
     base.separator(h = 10)
-    base.button(l = "Delete Locators", w = 200, c = "DeleteSecondary()")
+    base.button(l = "Delete Locators", w = 200, c = "SecondaryLocators.DeleteSecondary()")
     CheckGroup()
     base.showWindow()
 
