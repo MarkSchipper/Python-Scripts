@@ -11,16 +11,18 @@ def CreateJointsWindow():
 
     base.window("Joint Creation")
     base.rowColumnLayout(nc = 1)
-    base.button(l = "Create Joints", w = 200, c = "Joints.createJoints(Locators.ReturnSpineAmount(), Locators.ReturnFingerAmount())")
+    base.button(l = "Create Joints", w = 200, c = "Joints.createJoints()")
     base.button(l = "Delete Joints", w = 200, c = "Joints.deleteJoints()")
     base.showWindow()
 
     
   
-def createJoints(spineAmount,amount):
+def createJoints():
     #displayLayer = base.ls('RIG', type = 'displayLayer')
     base.select(deselect = True)
    
+    spineAmount = base.ls("Loc_SPINE_*", type = 'transform')
+    amount = base.ls("Loc_L_Finger_*_0", type = 'transform')
     if base.objExists('RIG'):
         print 'RIG already exists'
     else:
@@ -40,9 +42,11 @@ def createJoints(spineAmount,amount):
         pos = base.xform(s, q = True, t = True, ws = True)
         j = base.joint(radius = 0.8, p = pos, name = "RIG_SPINE_" + str(i))
     
-    createHead(spineAmount)
-    createArmJoints(spineAmount)
-    createFingerJoints(amount)
+    createHead(len(spineAmount))
+    createArmJoints(len(spineAmount))
+    createFingerJoints(len(amount))
+    if(base.objExists("Loc_Volume_0")):
+        CreateVolumeJoints()
     
     if (base.objExists('Loc_L_INV_Heel*')):
         createInverseFootRoll()
@@ -50,7 +54,34 @@ def createJoints(spineAmount,amount):
         print ''    
     createLegs()
     setJointOrientation()
-    
+
+def CreateVolumeJoints():    
+    allSpines = base.ls("RIG_SPINE_*", type = 'joint')
+    volumeLoc = base.ls("Loc_Volume_*", type = 'transform')
+    l_chestVolume = base.ls("Loc_L_ChestVolume_*", type = 'transform')
+    r_chestVolume = base.ls("Loc_R_ChestVolume_*", type = 'transform')    
+    print allSpines
+    print volumeLoc
+    for i, s in enumerate(allSpines):
+        if(i == len(allSpines) - 1):
+            base.select(s)
+            startPos = base.xform(s, q = True, t = True, ws = True)
+            pos = base.xform(base.ls("Loc_Breathing", type = 'transform'), q = True, t = True, ws = True)
+            breathingJointStart = base.joint(radius = 0.8, p = (startPos[0], startPos[1], startPos[2] + 0.05), name = "RIG_BREATHING_START")            
+            breathingJointEnd = base.joint(radius = 0.8, p = pos, name = "RIG_BREATHING_END")
+        else:    
+            base.select(s)
+            
+            pos = base.xform(volumeLoc[i], q = True, t = True, ws = True)
+            l_chestPos = base.xform(l_chestVolume[i], q = True, t = True, ws = True)
+            r_chestPos = base.xform(r_chestVolume[i], q = True, t = True, ws = True)            
+            
+            volumeJoint = base.joint(radius = 0.8, p = pos, name = "RIG_VOLUME_"+str(i))
+            base.select(s)
+            l_chestVolumeJoint = base.joint(radius = 0.8, p = l_chestPos, name = "RIG_L_CHEST_VOLUME_"+str(i))
+            base.select(s)
+            r_chestVolumeJoint = base.joint(radius = 0.8, p = r_chestPos, name = "RIG_R_CHEST_VOLUME_"+str(i))
+        
     
 def createHead(amount):
     base.select(deselect = True)
@@ -133,8 +164,6 @@ def createFinger(i):
     r_allFingers = base.ls( "Loc_R_Finger_" + str(i) + "_*", type='transform')
     r_fingers = base.listRelatives(r_allFingers, p = True, s = False)
 
-    print fingers    
-    
     for y, g in enumerate(r_allFingers):
         
         r_pos = base.xform(g, q = True, t = True, ws = True)

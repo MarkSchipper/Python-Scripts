@@ -1,5 +1,9 @@
 import maya.cmds as base
 
+import SetAttributes
+
+SetAttributes = reload(SetAttributes)
+
 def CreateConstraints(fingerCount, spineAmount):
     
     #left
@@ -26,6 +30,8 @@ def CreateConstraints(fingerCount, spineAmount):
     base.orientConstraint("CTRL_NECK", "RIG_Neck_Start", mo = True)
     base.orientConstraint("CTRL_HEAD", "RIG_Neck_End", mo = True)
     base.orientConstraint("CTRL_JAW", "RIG_Jaw_Start", mo = True)
+    if(base.objExists("CTRL_BREATHING")):
+        base.orientConstraint("CTRL_BREATHING", "RIG_BREATHING_START", mo = True)
     
     base.connectAttr("CTRL_SPINE_"+str(spineAmount - 1)+".rotateY", "IK_Spine.twist")
     
@@ -35,7 +41,9 @@ def CreateConstraints(fingerCount, spineAmount):
         for i, x in enumerate(l_twistJoints):   
             l_wristMultiply = base.shadingNode("multiplyDivide", asUtility = True, n = "L_ArmTwist_Node_"+str(i))
             base.setAttr(l_wristMultiply+".operation", 1)
-            base.setAttr(l_wristMultiply+".input2Y", 1 - (1 / len(l_twistJoints) * (i + 1)))
+            
+            print 1.0 - (1.0 / len(l_twistJoints) * (i + 1))
+            base.setAttr(l_wristMultiply+".input2Y", (1.0 - (1.0 / len(l_twistJoints) * (i + 1))) * -1)
             #input
             base.connectAttr("CTRL_L_Wrist.rotateY", "L_ArmTwist_Node_"+str(i)+".input1Y")
             #output
@@ -43,7 +51,7 @@ def CreateConstraints(fingerCount, spineAmount):
             
             r_wristMultiply = base.shadingNode("multiplyDivide", asUtility = True, n = "R_ArmTwist_Node_"+str(i))
             base.setAttr(r_wristMultiply+".operation", 1)
-            base.setAttr(r_wristMultiply+".input2Y", 1 - (1 / len(r_twistJoints) * (i + 1)))
+            base.setAttr(r_wristMultiply+".input2Y", (1.0 - (1.0 / len(r_twistJoints) * (i + 1))) * -1)
             #input
             base.connectAttr("CTRL_R_Wrist.rotateY", "R_ArmTwist_Node_"+str(i)+".input1Y")
             #output
@@ -88,6 +96,14 @@ def CreateConstraints(fingerCount, spineAmount):
         base.pointConstraint("CTRL_R_Foot", "RIG_R_INV_Heel", mo = True)
         base.orientConstraint("CTRL_R_Foot", "RIG_R_INV_Heel", mo = True)
         
+        base.connectAttr("CTRL_L_Foot.Foot_Roll", "RIG_L_INV_Ball.rotateX")
+        base.connectAttr("CTRL_L_Foot.Ball_Roll", "RIG_L_INV_Toes.rotateX")
+        
+        base.connectAttr("CTRL_R_Foot.Foot_Roll", "RIG_R_INV_Ball.rotateX")
+        base.connectAttr("CTRL_R_Foot.Ball_Roll", "RIG_R_INV_Toes.rotateX")
+        
+       
+        
     else:
         base.parent("IK_L_Toes", "IK_L_FootBall")
         base.parent("IK_L_FootBall", "IK_L_Leg")              
@@ -123,23 +139,36 @@ def CreateConstraints(fingerCount, spineAmount):
     base.connectAttr("CTRL_R_Foot.Knee_Twist", r_footAverage+".input1D[1]")  
     base.connectAttr(r_footAverage+".output1D", "IK_R_Leg.twist")  
     base.setAttr("CTRL_R_Foot.Knee_Fix", 90)
-        
+    
+    SetAttributes.LockAttributes()    
 
 def BindSkin():
     sel = base.ls(sl = True)
     if (len(sel) == 0):
         base.confirmDialog(title = "Empty Selection", message = "You have to select a mesh", button = ['Ok'])
     else:
-        base.skinCluster(sel[0], "RIG_ROOT", bm = 3, sm = 1, dr = 0.1)
-        base.geomBind('skinCluster1', bm = 3, gvp = [256, 1])   
+        for i in range(0, len(sel)):
+            base.skinCluster(sel[i], "RIG_ROOT", bm = 3, sm = 1, dr = 0.1, name = "Mesh"+str(i))
+            base.geomBind('Mesh'+str(i), bm = 3, gvp = [256, 1])   
+    
      
-    _rig = base.select("RIG")    
-    base.createDisplayLayer(nr = True, name = "RIG_LAYER")        
+
+    if (base.objExists("RIG_LAYER")):
+        _rig = base.select("RIG") 
+        base.editDisplayLayerMembers("RIG_LAYER", "RIG")
+    else:   
+        _rig = base.select("RIG") 
+        base.createDisplayLayer(nr = True, name = "RIG_LAYER")        
+    
     _ik = base.ls("IK_*")
     base.editDisplayLayerMembers("RIG_LAYER", _ik)
     
-    _ctrl = base.select("MASTER_CONTROLLER")
-    base.createDisplayLayer(nr = True, name = "CONTROLLERS")
+
+    if (base.objExists("CONTROLLERS")):
+        base.editDisplayLayerMembers("CONTROLLERS", "MASTER_CONTROLLER")
+    else:
+        _ctrl = base.select("MASTER_CONTROLLER")    
+        base.createDisplayLayer(nr = True, name = "CONTROLLERS")
         
         
         

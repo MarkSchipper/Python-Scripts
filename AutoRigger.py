@@ -6,6 +6,9 @@ import Controller
 import Constraints
 import CreateIK
 
+## TODO: FOOTROLL
+
+
 # we reload all classes when this file is executed, else we would need to restart Maya after every change
 Locators = reload(Locators)
 Joints = reload(Joints)
@@ -81,6 +84,7 @@ class AutoRigger():
         Controller.CreateController(_spineCount, _fingerCount)
         CreateIK.IKHandles()
         Constraints.CreateConstraints(_fingerCount, _spineCount)       
+
 
 
         

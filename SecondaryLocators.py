@@ -11,6 +11,8 @@ def CreateSecLocatorWindows():
     armTwist = base.intField(minValue = 2, maxValue = 10, value = 4)
     base.button(l = "Create Forearm Twist", w = 200,  c = "SecondaryLocators.CreateForearmTwist("+str(base.intField(armTwist, query = True, value = True))+")")
     base.separator(h = 10)
+    base.button(l = "Volume Locators", w = 200, c = "SecondaryLocators.CreateVolumeLocators()")
+    base.separator(h = 10)
     base.button(l = "Delete Locators", w = 200, c = "SecondaryLocators.DeleteSecondary()")
     CheckGroup()
     base.showWindow()
@@ -118,6 +120,35 @@ def CreateForearmTwist(amount):
         base.move(R_elbowPos[0] + (R_vectorX / amount) + ((R_vectorX / amount) * j), R_elbowPos[1] + (R_vectorY / amount) + ((R_vectorY / amount) * j), R_elbowPos[2] + (R_vectorZ / amount) + ((R_vectorZ / amount) * j), r_twistLoc)
         base.scale(0.05, 0.05, 0.05, r_twistLoc)
         base.parent(r_twistLoc, 'SECONDARY')
+
+def CreateVolumeLocators():
+    
+    spineLocs = base.ls("Loc_SPINE_*", type = 'transform')
+    print spineLocs
+    for i,x in enumerate(spineLocs):
+        spineLocation = base.xform(spineLocs[i], q = True, t = True, ws = True)
+        print i
+        print len(spineLocs)
+        if (i == len(spineLocs) - 1):
+            volumeLoc = base.spaceLocator(n = "Loc_Breathing")
+            base.move(spineLocation[0], spineLocation[1] - 0.1, spineLocation[2] + 0.3, volumeLoc)
+            base.scale(0.07, 0.07, 0.07, volumeLoc)
+            base.parent(volumeLoc, 'SECONDARY')
+        else:
+            volumeLoc = base.spaceLocator(n = "Loc_Volume_"+str(i))
+            base.move(spineLocation[0], spineLocation[1], spineLocation[2] + 0.4, volumeLoc)
+            base.scale(0.07, 0.07, 0.07, volumeLoc)
+            base.parent(volumeLoc, 'SECONDARY')
+            
+            l_chestVolume = base.spaceLocator(n = "Loc_L_ChestVolume_"+str(i))
+            base.move(spineLocation[0] + 0.25, spineLocation[1], spineLocation[2] + 0.15, l_chestVolume)
+            r_chestVolume = base.spaceLocator(n = "Loc_R_ChestVolume_"+str(i))                    
+            base.move(spineLocation[0] - 0.25, spineLocation[1], spineLocation[2] + 0.15, r_chestVolume)
+            base.scale(0.07, 0.07, 0.07, l_chestVolume)
+            base.scale(0.07, 0.07, 0.07, r_chestVolume)
+            base.parent(l_chestVolume, 'SECONDARY')
+            base.parent(r_chestVolume, 'SECONDARY')
+            
         
 def setColors():
     base.setAttr('SECONDARY.overrideEnabled', 1)

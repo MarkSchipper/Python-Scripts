@@ -11,6 +11,9 @@ def CreateController(spineCount, fingerCount):
     CreateClavicles(spineCount)
     CreateNeck(spineCount)
     CreateHead()
+    if (base.objExists("RIG_BREATHING_START")):
+        CreateBreathing(spineCount)
+        
     CreateFingers(fingerCount)
     setColors()
     
@@ -35,12 +38,19 @@ def CreatePelvis():
 def CreateWrists():    
 
     #left
-    L_wrist_ctrl = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_L_Wrist")
-    base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)
-    l_selection = base.select("CTRL_L_Wrist.cv[1]","CTRL_L_Wrist.cv[3]","CTRL_L_Wrist.cv[5]","CTRL_L_Wrist.cv[7]","CTRL_L_Wrist.cv[9]","CTRL_L_Wrist.cv[11]","CTRL_L_Wrist.cv[13]","CTRL_L_Wrist.cv[15]")
+    L_wrist_ctrl1 = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_L_Wrist0")
+    L_wrist_ctrl2 = base.circle(nr = (1,0,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_L_Wrist1")
+    L_wrist_ctrl3 = base.circle(nr = (0,0,1), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_L_Wrist2")
+    L_wrist_ctrl = base.group(em = True, name ="CTRL_L_Wrist")
+    curves = [L_wrist_ctrl1,L_wrist_ctrl2, L_wrist_ctrl3]
     
-    base.scale(0.7, 0.7, 0.7, l_selection)
-    base.scale(0.1, 0.1, 0.1, L_wrist_ctrl)
+    for cv in curves:
+        crvShape = base.listRelatives(cv, shapes = True)
+        base.parent(crvShape, L_wrist_ctrl, s = True, r = True)
+        base.delete(cv)
+        
+    base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)
+    base.scale(0.07, 0.07, 0.07, L_wrist_ctrl)
     
     l_wristPos = base.xform(base.ls("RIG_L_Wrist"), q = True, t = True, ws = True)
     l_wristRot = base.joint(base.ls("RIG_L_Wrist"), q = True, o = True)
@@ -52,12 +62,19 @@ def CreateWrists():
     base.parent(L_wrist_ctrl, "MASTER_CONTROLLER")
     
     #right
-    R_wrist_ctrl = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_R_Wrist")
-    base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)    
-    r_selection = base.select("CTRL_R_Wrist.cv[1]","CTRL_R_Wrist.cv[3]","CTRL_R_Wrist.cv[5]","CTRL_R_Wrist.cv[7]","CTRL_R_Wrist.cv[9]","CTRL_R_Wrist.cv[11]","CTRL_R_Wrist.cv[13]","CTRL_L_Wrist.cv[15]")
+    R_wrist_ctrl1 = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_R_Wrist0")
+    R_wrist_ctrl2 = base.circle(nr = (1,0,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_R_Wrist1")
+    R_wrist_ctrl3 = base.circle(nr = (0,0,1), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_R_Wrist2")
+    R_wrist_ctrl = base.group(em = True, name ="CTRL_R_Wrist")
+    curves = [R_wrist_ctrl1,R_wrist_ctrl2, R_wrist_ctrl3]
     
-    base.scale(0.7, 0.7, 0.7, r_selection)
-    base.scale(0.1, 0.1, 0.1, R_wrist_ctrl)
+    for cv in curves:
+        r_crvShape = base.listRelatives(cv, shapes = True)
+        base.parent(r_crvShape, R_wrist_ctrl, s = True, r = True)
+        base.delete(cv)
+    
+    base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)    
+    base.scale(0.07, 0.07, 0.07, R_wrist_ctrl)
     
     r_wristPos = base.xform(base.ls("RIG_R_Wrist"), q = True, t = True, ws = True)
     r_wristRot = base.joint(base.ls("RIG_R_Wrist"), q = True, o = True)
@@ -115,6 +132,18 @@ def CreateNeck(spineCount):
     base.parent(neck, "CTRL_SPINE_"+str(spineCount-1))
     
     base.makeIdentity(neck, apply = True, t = 1, r = 1, s = 1)
+
+def CreateBreathing(spineCount):
+    print 'breathing'
+    breathing = base.curve(p = [(0,0,0),(0.1, 0.1, 0), (0, 0.2,0), (-0.1, 0.1,0), (0,0,0)], degree = 1, name = "CTRL_BREATHING")
+    base.move(0, 0.1, 0, breathing+".scalePivot", breathing+".rotatePivot")
+    base.scale(0.3, 0.3, 0.3, breathing)
+    breathingPos = base.xform(base.ls("RIG_BREATHING_END"), q = True, t = True, ws = True)
+    breathingStart = base.xform(base.ls("RIG_BREATHING_START"), q = True, t = True, ws = True)
+    base.move(breathingPos[0], breathingPos[1] - 0.1, breathingPos[2] + 0.1, breathing)
+    base.move(breathingStart[0], breathingStart[1], breathingStart[2], breathing+".scalePivot", breathing+".rotatePivot")
+    base.parent(breathing, "CTRL_SPINE_"+str(spineCount - 1))
+    base.makeIdentity(breathing, apply = True, t = 1, r = 1, s = 1)   
  
 def CreateHead():    
     head = base.curve(p = [(0.5,0,0), (0.25,-0.25,-0.5), (0.25,-0.5, -0.5), (0,-0.6,-0.5),(-0.25,-0.5,-0.5), (-0.25, -0.25, -0.5), (-0.5,0,0), (-0.25, -0.25, 0.5), (-0.25, -0.5, 0.5), (0,-0.6, 0.5) ,(0.25, -0.5, 0.5),(0.25, -0.25, 0.5), (0.5,0,0)], degree = 1, name = "CTRL_HEAD")
@@ -143,11 +172,15 @@ def CreateFeet():
     base.addAttr(shortName = "KF", longName = "Knee_Twist", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)            
     base.addAttr(shortName = "KR", longName = "Knee_Fix", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)            
     base.addAttr(shortName = "FR", longName = "Foot_Roll", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)            
+    base.addAttr(shortName = "BR", longName = "Ball_Roll", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)            
+
 
     r_arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1, name = "CTRL_R_Foot")
     base.addAttr(shortName = "KF", longName = "Knee_Twist", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)            
     base.addAttr(shortName = "KR", longName = "Knee_Fix", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)            
-    base.addAttr(shortName = "FR", longName = "Foot_Roll", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)                            
+    base.addAttr(shortName = "FR", longName = "Foot_Roll", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True) 
+    base.addAttr(shortName = "BR", longName = "Ball_Roll", attributeType = 'double', defaultValue = 0, minValue = 0, maxValue = 100, keyable = True)                           
+  
     
     base.scale(0.08, 0.08, 0.08, l_arrow)
     base.scale(0.08, 0.08, 0.08, r_arrow)
