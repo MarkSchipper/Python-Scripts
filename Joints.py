@@ -212,7 +212,7 @@ def createInverseFootRoll():
 def setJointOrientation():
 
     base.select('RIG_ROOT')
-    base.joint(e = True, ch = True, oj = 'xyz', secondaryAxisOrient = 'yup')    
+    base.joint(e = True, ch = True, oj = 'xyz', secondaryAxisOrient = 'xup')    
       
 def deleteJoints():
     base.select(deselect = True)

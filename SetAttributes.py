@@ -47,11 +47,11 @@ def LockAttributes():
             base.setAttr('CTRL_L_Finger_'+str(j)+'.translate'+axe, lock = True, k = False)            
             base.setAttr('CTRL_R_Finger_'+str(j)+'.translate'+axe, lock = True, k = False)
             
-            base.setAttr('CTRL_L_Finger_'+str(j)+'.rotateX', lock = True, k = False)            
-            base.setAttr('CTRL_L_Finger_'+str(j)+'.rotateY', lock = True, k = False)            
+            #base.setAttr('CTRL_L_Finger_'+str(j)+'.rotateX', lock = True, k = False)            
+            #base.setAttr('CTRL_L_Finger_'+str(j)+'.rotateY', lock = True, k = False)            
                         
-            base.setAttr('CTRL_R_Finger_'+str(j)+'.rotateX', lock = True, k = False)            
-            base.setAttr('CTRL_R_Finger_'+str(j)+'.rotateY', lock = True, k = False)            
+            #base.setAttr('CTRL_R_Finger_'+str(j)+'.rotateX', lock = True, k = False)            
+            #base.setAttr('CTRL_R_Finger_'+str(j)+'.rotateY', lock = True, k = False)            
             
             
             

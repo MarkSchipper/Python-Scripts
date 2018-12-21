@@ -1,10 +1,12 @@
 import maya.cmds as base
 import Locators
 import Joints
-import SecondaryLocators
+import SecondaryLocators as SL
 import Controller
 import Constraints
 import CreateIK
+import FaceJoints as FJ
+import os
 
 ## TODO: FOOTROLL
 
@@ -12,10 +14,11 @@ import CreateIK
 # we reload all classes when this file is executed, else we would need to restart Maya after every change
 Locators = reload(Locators)
 Joints = reload(Joints)
-SecondaryLocators = reload(SecondaryLocators)
+SL = reload(SL)
 Controller = reload(Controller)
 Constraints = reload(Constraints)
 CreateIK = reload(CreateIK)
+FJ  = reload(FJ)
 
 global selected
 global prefix
@@ -25,7 +28,7 @@ class AutoRigger():
     def __init__(self):
         base.currentUnit(linear = 'meter')
         base.grid(size = 12, spacing = 5, divisions = 5)
-        
+        print os.path.dirname(os.path.realpath(__file__))
         self.BuildUI()
        
     def BuildUI(self): 
@@ -41,10 +44,10 @@ class AutoRigger():
         # set the layout of the window
         #base.rowColumnLayout(nc = 2, columnWidth=[(1,175), (2, 225)])
         base.columnLayout(adj = True)
-
+        base.image(w = 400, h = 100, image = os.path.dirname(os.path.realpath(__file__))+"\logo.jpg")
         settingsText = base.text('Settings', l = 'Rig Settings')
         base.separator(st = 'none')       
-        base.text(l = 'Prefix', w = 100)
+        #base.text(l = 'Prefix', w = 100)
         self.prefix = base.textFieldGrp(w = 100, text = 'test', editable = True)
         self.spineCount = base.intSliderGrp(l = "Spine Count", min = 1, max = 10, value = 4, step = 1, field = True)
         #spineCount = base.intField(minValue = 1, maxValue = 10, value = 4)
@@ -55,11 +58,14 @@ class AutoRigger():
         base.separator(h = 10, st = 'none') 
         base.button(l = "Create Base Locators", w = 200, c = self.DoLocators)          
         base.separator(st = 'none')
-        base.button(l = "Create Secondary Locators", w = 200, c = "SecondaryLocators.CreateSecLocatorWindows()")
-        base.separator(st = 'none')
-        base.button(l = "Delete All Locators", w = 200, c = "Locators.deleteLocators()")
+        base.button(l = "Create Secondary Locators", w = 200, c = "SL.SecondaryLocators()")
+        base.separator(st = 'none', h = 20)
+        base.button(l = "Create Facial Locators", w = 200, c = "FJ.FaceJoints()")
         base.separator(st = 'none')        
         base.button(l = "Mirror L->R", w = 200, c = "Locators.mirrorLocators()")
+        base.separator(st = 'none')
+        base.button(l = "Delete All Locators", w = 200, c = "Locators.deleteLocators()")
+        
         base.separator(st = 'none')    
         base.button(l = "Joints Window", w = 200, c = "Joints.CreateJointsWindow()")
         base.separator(st = 'none')    
