@@ -54,10 +54,10 @@ def IKHandles():
     curveCV = base.ls('SpineCurve.cv[0:]', fl = True)
     
     for k, cv in enumerate(curveCV):
-        c = base.cluster(cv, cv, n = "Cluster_"+str(k)+"_")
+        c = base.cluster(cv, cv, n = "Spine_Cluster_"+str(k)+"_")
         
         if k > 0:
-            base.parent(c, "Cluster_"+str(k - 1)+"_Handle")
+            base.parent(c, "Spine_Cluster_"+str(k - 1)+"_Handle")
     
     spineAmount = base.ls("Loc_SPINE_*", type = 'transform')
     base.ikHandle(n = "IK_Spine", sj = "RIG_ROOT", ee = "RIG_SPINE_" + str(len(spineAmount) - 1), sol = 'ikSplineSolver', c = 'SpineCurve', ccv = False)    

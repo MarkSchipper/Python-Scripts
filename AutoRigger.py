@@ -20,9 +20,6 @@ Constraints = reload(Constraints)
 CreateIK = reload(CreateIK)
 FJ  = reload(FJ)
 
-global selected
-global prefix
-
 class AutoRigger():
    
     def __init__(self):
@@ -41,9 +38,15 @@ class AutoRigger():
         
         base.window("Auto Rigger")
 
+        form = base.formLayout()
+        tabs = base.tabLayout(imh = 5, imw = 5)
+        
+        base.formLayout(form, edit = True, attachForm=((tabs, 'top',0), (tabs,'left', 0), (tabs, 'right', 0), (tabs, 'bottom',0)))
+
         # set the layout of the window
-        #base.rowColumnLayout(nc = 2, columnWidth=[(1,175), (2, 225)])
-        base.columnLayout(adj = True)
+
+        ch1 = base.rowColumnLayout(nc = 1, cal = (1, 'right'), adjustableColumn = True)
+        
         base.image(w = 400, h = 100, image = os.path.dirname(os.path.realpath(__file__))+"\logo.jpg")
         settingsText = base.text('Settings', l = 'Rig Settings')
         base.separator(st = 'none')       
@@ -55,6 +58,10 @@ class AutoRigger():
         #fingerCount = base.intField(minValue = 0, maxValue = 10, value = 5)
         base.separator(h = 10, st = 'none')    
         self.doubleElbow = base.checkBox(l = 'Double Elbow', align = 'left' )
+        
+        base.setParent('..')
+        
+        ch2 = base.rowColumnLayout(nc = 1, cal = (1, 'right'), adjustableColumn = True)        
         base.separator(h = 10, st = 'none') 
         base.button(l = "Create Base Locators", w = 200, c = self.DoLocators)          
         base.separator(st = 'none')
@@ -66,16 +73,29 @@ class AutoRigger():
         base.separator(st = 'none')
         base.button(l = "Delete All Locators", w = 200, c = "Locators.deleteLocators()")
         
+        base.setParent('..')        
+        ch3 = base.rowColumnLayout(nc = 1, cal = (1, 'right'), adjustableColumn = True)
+        
         base.separator(st = 'none')    
         base.button(l = "Joints Window", w = 200, c = "Joints.CreateJointsWindow()")
         base.separator(st = 'none')    
+        
+        base.setParent('..')        
+        ch4 = base.rowColumnLayout(nc = 1, cal = (1, 'right'), adjustableColumn = True)        
+        
         base.button(l = "Finalize Rig", w = 200, c = self.FinalizeRig)
         base.separator(st = 'none')    
         base.button(l = "Bind Skin", w = 200, c = "Constraints.BindSkin()")
 
+        base.setParent('..') 
         
+        base.tabLayout(tabs, edit = True, tabLabel = ((ch1, 'Settings'), (ch2, 'Locators'), (ch3, 'Facial Rig'), (ch4, 'Finalize') ))
+               
         # show the actual window
         base.showWindow()
+    
+    def NextTab(self, void):
+        base.tabLayout(edit = True, st = "2")
         
     def DoLocators(self, void):
         _spineCount = base.intSliderGrp(self.spineCount, q = True, v = True)

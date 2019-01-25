@@ -134,7 +134,7 @@ def CreateNeck(spineCount):
     base.makeIdentity(neck, apply = True, t = 1, r = 1, s = 1)
 
 def CreateBreathing(spineCount):
-    print 'breathing'
+
     breathing = base.curve(p = [(0,0,0),(0.1, 0.1, 0), (0, 0.2,0), (-0.1, 0.1,0), (0,0,0)], degree = 1, name = "CTRL_BREATHING")
     base.move(0, 0.1, 0, breathing+".scalePivot", breathing+".rotatePivot")
     base.scale(0.3, 0.3, 0.3, breathing)
@@ -201,7 +201,7 @@ def CreateFingers(fingerCount):
     for i in range(0, fingerCount):
         
         allFingers =  base.ls("RIG_L_Finger_"+str(i)+"_0")   
-        print allFingers 
+        
 
         finger = base.curve(p =[(0,0,0), (0,0,0.5), (0.2, 0, 0.7),(0,0,0.9), (-0.2, 0, 0.7), (0,0,0.5)], degree = 1, name = "CTRL_L_Finger_"+str(i))
         for j, fi in enumerate(allFingers):
@@ -216,7 +216,7 @@ def CreateFingers(fingerCount):
     for k in range(0, fingerCount):
         
         allFingers =  base.ls("RIG_R_Finger_"+str(k)+"_0")   
-        print allFingers 
+
 
         finger = base.curve(p =[(0,0,0), (0,0,0.5), (0.2, 0, 0.7),(0,0,0.9), (-0.2, 0, 0.7), (0,0,0.5)], degree = 1, name = "CTRL_R_Finger_"+str(k))
         for l, fi in enumerate(allFingers):

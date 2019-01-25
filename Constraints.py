@@ -58,12 +58,14 @@ def CreateConstraints(fingerCount, spineAmount):
             base.connectAttr("R_ArmTwist_Node_"+str(i)+".outputY", "RIG_R_ArmTwist_"+str(i)+".rotateX")
             
     
-    clusters = base.ls("Cluster_*", type = 'transform')
+    clusters = base.ls("Spine_Cluster_*", type = 'transform')
     spineCtrl = base.ls("CTRL_SPINE_*", type = 'transform')      
     
     for j, cl in enumerate(clusters):
         if j > 0:
+            print j
             base.parent(cl, spineCtrl[j - 1])
+            print spineCtrl[j - 1]
         else:
             base.parent(cl, "CTRL_PELVIS")     
             
@@ -159,7 +161,7 @@ def BindSkin():
     else:
         for i in range(0, len(sel)):
             base.skinCluster(sel[i], "RIG_ROOT", bm = 3, sm = 1, dr = 0.1, name = "Mesh"+str(i))
-            base.geomBind('Mesh'+str(i), bm = 3, gvp = [512, 1])   
+            base.geomBind('Mesh'+str(i), bm = 3, gvp = [64, 1])   
     
      
 
