@@ -214,12 +214,12 @@ class FaceJoints():
         base.group(em = True, n = "grpFACE_JOINTS")
         base.parent(base.ls("FACERIG_*"), "grpFACE_JOINTS")
         
+        base.parent("RIG_Jaw_Start", "FACERIG_Head_Dummy")
+        
         self.CreateParents(self)
             
     def CreateParents(self, void):
-        if base.objExists("RIG_Neck_End"):
-            base.parent(base.ls('FACERIG_Head_Dummy'), base.ls('RIG_Neck_End'))
-        
+       
         sides = ['L', 'R']
         
         for side in sides:
@@ -294,7 +294,9 @@ class FaceJoints():
         
         grpIK = base.group(em = True, n = "grpFACEIK")
         base.parent(base.ls("FACE_IK*"), "grpFACEIK")    
-            
+        
+        base.parentConstraint("CTRL_HEAD", "FACERIG_Head_Dummy", mo = True)
+        
         self.AddControllers(self)                         
                     
     def AddControllers(self, void):

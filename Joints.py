@@ -92,7 +92,7 @@ def createHead(amount):
     base.joint(radius = 1, p = base.xform(base.ls('Loc_Head'), q = True, t = True, ws = True), name = "RIG_Head")
     
     base.select(deselect = True)
-    base.select("RIG_Neck_End")
+    #base.select("RIG_Neck_End")
     
     jawJointStart = base.joint(radius= 1, p = base.xform(base.ls('Loc_Jaw_Start'), q = True, t = True, ws = True), name = 'RIG_Jaw_Start')
     jawJointEnd = base.joint(radius = 1, p = base.xform(base.ls('Loc_Jaw_End'), q = True, t = True, ws = True), name = 'RIG_Jaw_End')
