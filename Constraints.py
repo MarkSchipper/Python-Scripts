@@ -41,9 +41,12 @@ def CreateConstraints(fingerCount, spineAmount):
         for i, x in enumerate(l_twistJoints):   
             l_wristMultiply = base.shadingNode("multiplyDivide", asUtility = True, n = "L_ArmTwist_Node_"+str(i))
             base.setAttr(l_wristMultiply+".operation", 1)
-            
-            print 1.0 - (1.0 / len(l_twistJoints) * (i + 1))
             base.setAttr(l_wristMultiply+".input2Y", (1.0 - (1.0 / len(l_twistJoints) * (i + 1))) * -1)
+            
+            
+            #check connections
+            print base.listConnections("L_ArmTwist_Node_"+str(i), plugs = True)
+            
             #input
             base.connectAttr("CTRL_L_Wrist.rotateY", "L_ArmTwist_Node_"+str(i)+".input1Y")
             #output
@@ -75,14 +78,14 @@ def CreateConstraints(fingerCount, spineAmount):
         r_allFingers = base.ls("RIG_R_Finger_"+str(k)+"_*")        
         
         if(k > 0):
-            base.connectAttr("CTRL_L_Finger_"+str(k)+".rotateY", l_allFingers[0]+".rotateZ")
-            base.connectAttr("CTRL_R_Finger_"+str(k)+".rotateY", r_allFingers[0]+".rotateZ")
+            base.connectAttr("CTRL_L_Finger_"+str(k)+".rotateZ", l_allFingers[0]+".rotateY")
+            base.connectAttr("CTRL_R_Finger_"+str(k)+".rotateZ", r_allFingers[0]+".rotateY")
         
             for l, l_finger in enumerate(l_allFingers):
-                base.connectAttr("CTRL_L_Finger_"+str(k)+".rotateZ", l_finger+".rotateY")
+                base.connectAttr("CTRL_L_Finger_"+str(k)+".rotateY", l_finger+".rotateZ")
             
             for m, r_finger in enumerate(r_allFingers):
-                base.connectAttr("CTRL_R_Finger_"+str(k)+".rotateZ", r_finger+".rotateY")
+                base.connectAttr("CTRL_R_Finger_"+str(k)+".rotateY", r_finger+".rotateZ")
         else:
             base.connectAttr("CTRL_L_Finger_"+str(k)+".rotateZ", l_allFingers[0]+".rotateY")
             base.connectAttr("CTRL_R_Finger_"+str(k)+".rotateZ", r_allFingers[0]+".rotateY")
@@ -161,7 +164,7 @@ def BindSkin():
     else:
         for i in range(0, len(sel)):
             base.skinCluster(sel[i], "RIG_ROOT", bm = 3, sm = 1, dr = 0.1, name = "Mesh"+str(i))
-            base.geomBind('Mesh'+str(i), bm = 3, gvp = [64, 1])   
+            base.geomBind('Mesh'+str(i), bm = 3, gvp = [256, 1])   
     
      
 

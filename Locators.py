@@ -322,7 +322,7 @@ def createHands(side, wrist):
                 createFingers(-1, pos, i)
 
 def createFingers(side, handPos, count):
-    for x in range(0,3):
+    for x in range(0,4):
         if side == 1:
             finger = base.spaceLocator(n = 'Loc_L_Finger_' + str(count) + '_' + str(x))
             base.scale(0.05, 0.05, 0.05, finger)

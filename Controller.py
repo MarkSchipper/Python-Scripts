@@ -48,10 +48,10 @@ def CreateWrists():
         crvShape = base.listRelatives(cv, shapes = True)
         base.parent(crvShape, L_wrist_ctrl, s = True, r = True)
         base.delete(cv)
-        
+    base.select("CTRL_L_Wrist")    
     base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)
     base.scale(0.07, 0.07, 0.07, L_wrist_ctrl)
-    
+
     l_wristPos = base.xform(base.ls("RIG_L_Wrist"), q = True, t = True, ws = True)
     l_wristRot = base.joint(base.ls("RIG_L_Wrist"), q = True, o = True)
     
@@ -72,7 +72,7 @@ def CreateWrists():
         r_crvShape = base.listRelatives(cv, shapes = True)
         base.parent(r_crvShape, R_wrist_ctrl, s = True, r = True)
         base.delete(cv)
-    
+    base.select("CTRL_R_Wrist")    
     base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)    
     base.scale(0.07, 0.07, 0.07, R_wrist_ctrl)
     

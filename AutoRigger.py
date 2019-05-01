@@ -66,11 +66,11 @@ class AutoRigger():
         base.button(l = "Create Base Locators", w = 200, c = self.DoLocators)          
         base.separator(st = 'none')
         base.button(l = "Create Secondary Locators", w = 200, c = "SL.SecondaryLocators()")
-        base.separator(st = 'none', h = 20)
-        base.button(l = "Create Facial Locators", w = 200, c = "FJ.FaceJoints()")
-        base.separator(st = 'none')        
-        base.button(l = "Mirror L->R", w = 200, c = "Locators.mirrorLocators()")
         base.separator(st = 'none')
+        base.button(l = "Mirror L->R", w = 200, c = "Locators.mirrorLocators()")
+        base.separator(st = 'none', h = 20)
+        base.button(l = "Create Facial Locators", w = 200, c = self.FaceLocators)
+        base.separator(st = 'none')        
         base.button(l = "Delete All Locators", w = 200, c = "Locators.deleteLocators()")
         
         base.setParent('..')        
@@ -80,16 +80,23 @@ class AutoRigger():
         base.button(l = "Joints Window", w = 200, c = "Joints.CreateJointsWindow()")
         base.separator(st = 'none')    
         
+        base.setParent('..')
+        ch4 = base.rowColumnLayout(nc = 1, cal = (1, 'right'), adjustableColumn = True)
+        base.button(l = "Add Facial Joints", w = 200, c = self.FaceJoints)
+        base.separator(st = 'none')
+        
         base.setParent('..')        
-        ch4 = base.rowColumnLayout(nc = 1, cal = (1, 'right'), adjustableColumn = True)        
+        ch5 = base.rowColumnLayout(nc = 1, cal = (1, 'right'), adjustableColumn = True)        
         
         base.button(l = "Finalize Rig", w = 200, c = self.FinalizeRig)
         base.separator(st = 'none')    
         base.button(l = "Bind Skin", w = 200, c = "Constraints.BindSkin()")
+        base.separator(st = 'none')
+        base.button(l = "Clear Locators", w = 200, c = self.ClearScene)
 
         base.setParent('..') 
         
-        base.tabLayout(tabs, edit = True, tabLabel = ((ch1, 'Settings'), (ch2, 'Locators'), (ch3, 'Facial Rig'), (ch4, 'Finalize') ))
+        base.tabLayout(tabs, edit = True, tabLabel = ((ch1, 'Settings'), (ch2, 'Locators'), (ch3, 'Body Rig'), (ch4, 'Face Rig'), (ch5, 'Finalize') ))
                
         # show the actual window
         base.showWindow()
@@ -102,15 +109,26 @@ class AutoRigger():
         _fingerCount = base.intSliderGrp(self.fingerCount, q = True, v = True)
         _doubleElbow = base.checkBox(self.doubleElbow, q = True, v = True)
         Locators.CreateLocators(_spineCount, _fingerCount, _doubleElbow)
-
+    
+    def FaceLocators(self, void):
+        FJ.FaceJoints().CreateFaceWindow(self)
+    
+    def FaceJoints(self, void):
+        FJ.FaceJoints().CreateJoints(self)
+    
     def FinalizeRig(self, void):
         
         _spineCount = base.intSliderGrp(self.spineCount, q = True, v = True)
         _fingerCount = base.intSliderGrp(self.fingerCount, q = True, v = True) 
         Controller.CreateController(_spineCount, _fingerCount)
         CreateIK.IKHandles()
-        Constraints.CreateConstraints(_fingerCount, _spineCount)       
+        Constraints.CreateConstraints(_fingerCount, _spineCount)  
+        FJ.FaceJoints().AddConstraints(self)     
 
+    def ClearScene(self, void):
+        base.delete("Loc_Master")
+        base.delete("SECONDARY")
+        base.delete("FACE_LOC")
 
 
         

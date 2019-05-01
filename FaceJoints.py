@@ -3,7 +3,8 @@ import maya.cmds as base
 class FaceJoints():
 
     def __init__(self):
-        self.CreateFaceWindow(self)
+        pass
+#        self.CreateFaceWindow(self)
         
     
     def CreateFaceWindow(self, void):
@@ -15,12 +16,6 @@ class FaceJoints():
         base.button(l = "Create Face Locators", w = 200, c = self.Locators)
         base.separator(st = 'none')
         base.button(l = "Mirror L -> R", w = 200, c = self.MirrorLocators)
-        base.separator(st = 'none', h = 30)
-        base.button(l = "Add Joints", w = 200, c = self.CreateJoints)
-        base.separator(st = 'none', h = 30)    
-        base.button(l = "Add Controllers", w = 200, c = self.AddConstraints)
-        base.separator(st = 'none')
-        
         base.showWindow()
     
     def Locators(self, void):
@@ -48,13 +43,13 @@ class FaceJoints():
             
           for side in self.sides:
             
-                eyeCenterLoc = base.spaceLocator(n = "Loc_Face"+side+"_EyeCenter")
+                eyeCenterLoc = base.spaceLocator(n = "Loc_Face_"+side+"_EyeCenter")
                 base.scale(0.01, 0.01, 0.01, eyeCenterLoc)
                 eyePos = base.xform(base.ls(side+"_Eye.rotatePivot"), q = True, t = True, ws = True)
                 base.move(eyePos[0], eyePos[1], eyePos[2], eyeCenterLoc)
                 base.parent(eyeCenterLoc, "FACE_LOC")                 
 
-                eyeAimLoc = base.spaceLocator(n = "Loc_Face"+side+"_EyeAim")
+                eyeAimLoc = base.spaceLocator(n = "Loc_Face_"+side+"_EyeAim")
                 base.scale(0.01, 0.01, 0.01, eyeAimLoc) 
                 base.move(eyePos[0] - (0.004 * self.sideMultiplier), eyePos[1], eyePos[2]+0.025, eyeAimLoc)
                 base.parent(eyeAimLoc, "FACE_LOC")
@@ -196,15 +191,12 @@ class FaceJoints():
             if loc == "Loc_Face_Head_Dummy":
                 base.select(deselect = True)
                 base.joint(radius = 1, p = locPos, n = "FACERIG_Head_Dummy")
-            
-           
             else:
                 base.select(deselect = True)
                 base.joint(radius = 1, p = locPos, n = "FACERIG_"+str(loc).split("Loc_Face_")[1])
                 
         
-        if base.objExists("RIG_Neck_End"):
-            base.parent("FACERIG_Head_Dummy", "RIG_Neck_End")
+       
         
         sides = ['L', 'R']
         
@@ -215,17 +207,45 @@ class FaceJoints():
             for eyeJoint in allEyeJoints:
          
                 base.select(deselect = True)
-                rotateJoint = base.joint(radius = 0.5, p = centerLocPos, n = str(eyeJoint)+"_rotateJoint")           
-                base.parent(eyeJoint, rotateJoint)
-                base.parent(rotateJoint, "FACERIG_"+side+"_EyeCenter")
-               
+                rotateJoint = base.joint(radius = 0.5, p = centerLocPos, n = str(eyeJoint)+"_rotateJoint") 
+    
             eyeAimRotate = base.joint(radius = 0.7, p = centerLocPos, n = "FACERIG_"+side+"_EyeAim.rotateJoint")
-            
-            base.parent("FACERIG_"+side+"_EyeAim", eyeAimRotate)
-            base.parent(eyeAimRotate, "FACERIG_"+side+"_EyeCenter")
-            base.parent("FACERIG_"+side+"_EyeCenter", "FACERIG_Head_Dummy")       
-           
+  
+        base.group(em = True, n = "grpFACE_JOINTS")
+        base.parent(base.ls("FACERIG_*"), "grpFACE_JOINTS")
         
+        self.CreateParents(self)
+            
+    def CreateParents(self, void):
+        if base.objExists("RIG_Neck_End"):
+            base.parent(base.ls('FACERIG_Head_Dummy'), base.ls('RIG_Neck_End'))
+        
+        sides = ['L', 'R']
+        
+        for side in sides:
+
+            allUpperEyeRotateJoints = base.ls("FACERIG_"+side+"_Upper*rotateJoint", type = 'joint')
+            allLowerEyeRotateJoints = base.ls("FACERIG_"+side+"_Lower*rotateJoint", type = 'joint')
+
+            for i in range(0, len(allUpperEyeRotateJoints)):
+                if("Aim" in allUpperEyeRotateJoints[i]):
+                    pass
+                else:    
+                    base.parent("FACERIG_"+side+"_UpperEyeLid_"+str(i), allUpperEyeRotateJoints[i])
+                    base.parent(allUpperEyeRotateJoints[i], "FACERIG_"+side+"_EyeCenter")
+            
+            for j in range(0,  len(allLowerEyeRotateJoints)):
+                if("Aim" in allLowerEyeRotateJoints[j]):
+                    pass
+                else:
+                    #pass
+                    base.parent("FACERIG_"+side+"_LowerEyeLid_"+str(j), allLowerEyeRotateJoints[j])
+                    base.parent(allLowerEyeRotateJoints[j], "FACERIG_"+side+"_EyeCenter")
+        
+            base.parent("FACERIG_"+side+"_EyeAim", "FACERIG_"+side+"_EyeAim_rotateJoint")
+            base.parent("FACERIG_"+side+"_EyeAim_rotateJoint", "FACERIG_"+side+"_EyeCenter")
+            base.parent("FACERIG_"+side+"_EyeCenter", "FACERIG_Head_Dummy")
+            
         allSmileJoints = base.ls("FACERIG_*_Smile*")
         allBrowJoints = base.ls("FACERIG_*_*Brow*")
         allMouthJoints = base.ls("FACERIG_*_*Mouth*")
@@ -247,13 +267,8 @@ class FaceJoints():
         for smile in allSmileJoints:
             base.select(deselect = True)
             base.parent(smile, "FACERIG_Head_Dummy")
-
-
-        base.select("FACERIG_Head_Dummy")
-        base.joint(e = True, ch = True, oj = 'xyz', secondaryAxisOrient = 'xup')       
+                     
         
-        base.group(em = True, n = "grpFACE_JOINTS")
-        base.parent(base.ls("FACERIG_*"), "grpFACE_JOINTS")
        
     def AddConstraints(self, void):
         sides = ['L', 'R']
@@ -356,6 +371,9 @@ class FaceJoints():
             upperEyeBrownCenterCtrl = base.polyCylinder(r = 0.003, h = 0.001, ax = [0,0,1], n = "FACE_MAIN_CTRL_"+side+"_UpperEyeBrow_2")            
             base.move(upperEyeBrowCenterCtrlPos1[0] + (upperEyeBrowCenterDistance[0] / 2), upperEyeBrowCenterCtrlPos1[1] + (upperEyeBrowCenterDistance[1] / 2), upperEyeBrowCenterCtrlPos1[2] + upperEyeBrowCenterDistance[2] + 0.003, upperEyeBrownCenterCtrl)  
             base.makeIdentity(upperEyeBrownCenterCtrl, apply = True, t = 1, r = 1, s = 1)
+            
+            upperEyeBrow_2_CtrlGRP = base.group(em = True, n = "GRP_FACE_CTRL_"+side+"_UpperEyeBrow_2")
+            base.parent(base.ls(upperEyeBrownCenterCtrl, type = 'transform'), upperEyeBrow_2_CtrlGRP)
         
         mainEyeCtrl = base.curve(p = [(r_eyeCtrlPos[4][0] - 0.01, r_eyeCtrlPos[6][1] -0.02, 0.25), (r_eyeCtrlPos[4][0] - 0.01, r_eyeCtrlPos[3][1] + 0.02, 0.25), (l_eyeCtrlPos[4][0] + 0.01, l_eyeCtrlPos[3][1] + 0.02, 0.25), (l_eyeCtrlPos[4][0] + 0.01, l_eyeCtrlPos[3][1] - 0.01, 0.25), (r_eyeCtrlPos[4][0] - 0.01, r_eyeCtrlPos[6][1] -0.02, 0.25)], degree = 1, n = "FACE_MAIN_CTRL_PARENT_EYES")
         base.xform(mainEyeCtrl, cp = True)
@@ -365,8 +383,10 @@ class FaceJoints():
         base.xform(faceCtrl, cp = True) 
     
         base.scale(0.3,0.3, 0.3, faceCtrl)
-        
-        headLocPos = base.xform(base.ls("Loc_Head"), q = True, t = True, ws = True)
+        if(base.objExists("Loc_Head")):
+            headLocPos = base.xform(base.ls("Loc_Head"), q = True, t = True, ws = True)
+        else:
+            headLocPos = base.xform(base.ls("RIG_Head"), q = True, t = True, ws = True)
         base.move(headLocPos[0] + 0.05, headLocPos[1] + 0.04, headLocPos[2], faceCtrl)   
         base.makeIdentity(faceCtrl, apply = True, t = 1, r = 1, s = 1)
     
@@ -718,11 +738,14 @@ class FaceJoints():
                         base.connectAttr(multDiv+".output", unitConv2+".input")
                         base.connectAttr(unitConv2+".output", grp+".translate")
         
-        
+                if "LowerMouth" in grp:
+                    
+                    base.parentConstraint("CTRL_JAW", grp, mo = True)
+                    
         allCtrls = base.ls("FACE_CTRL_*", type = 'transform')
         allJoints = base.ls("FACERIG_*", type = 'joint')
         
-        
+        base.parent("MASTER_FACE_CTRL", "CTRL_HEAD")
         ctrlGrps = []
         jointFiltered = []
         

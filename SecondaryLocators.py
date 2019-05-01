@@ -11,46 +11,49 @@ class SecondaryLocators():
     
         base.window("Secondary Controllers")
         base.rowColumnLayout(nc = 1)
-        base.button(l = "Create Reverse Footroll", w = 200, c = "SecondaryLocators.CreateReverseFootroll()")
+        base.button(l = "Create Reverse Footroll", w = 200, c = self.CreateReverseFootroll)
         base.separator(h = 10)
         #armTwist = base.intField(minValue = 2, maxValue = 10, value = 4)
         self.armTwist = base.intSliderGrp(l = "Arm Twist Amount", min = 4, max = 10, value = 4, step = 1, field = True)
         base.button(l = "Create Forearm Twist", w = 200, c = self.ArmTwist)
         #base.button(l = "Create Forearm Twist", w = 200,  c = "SecondaryLocators.CreateForearmTwist("+str(base.intField(armTwist, query = True, value = True))+")")
         base.separator(h = 10)
-        base.button(l = "Volume Locators", w = 200, c = "SecondaryLocators.CreateVolumeLocators()")
+        base.button(l = "Volume Locators", w = 200, c = self.CreateVolumeLocators)
         base.separator(h = 10)
-        base.button(l = "Delete Locators", w = 200, c = "SecondaryLocators.DeleteSecondary()")
-        CheckGroup()
+        base.button(l = "Delete Locators", w = 200, c = self.DeleteSecondary)
+        self.CheckGroup(self)
         base.showWindow()
     
     
     def ArmTwist(self, void):
         _amount = base.intSliderGrp(self.armTwist, q = True, v = True)
-        CreateForearmTwist(_amount)    
+        self.CreateForearmTwist(self,_amount)    
     
-    def CheckGroup():
+    def CheckGroup(self,void):
         if base.objExists('SECONDARY'):
             print 'group exists'
         else:
             base.group(em = True, n = "SECONDARY")
     
-        setColors()
+        self.setColors(self)
      
      
-    def CreateReverseFootroll():
+    def CreateReverseFootroll(self,void):
     
         #ankles
         base.select(deselect = True)
-        l_rev_ankle = base.spaceLocator(n = "Loc_L_INV_Heel")
-        base.scale(0.05, 0.05, 0.05, l_rev_ankle)
-        base.move(0.15, 0, 0, l_rev_ankle)
-        base.parent(l_rev_ankle, 'SECONDARY')
+        l_rev_heel = base.spaceLocator(n = "Loc_L_INV_Heel")
+        base.scale(0.05, 0.05, 0.05, l_rev_heel)
         
-        r_rev_ankle = base.spaceLocator(n = "Loc_R_INV_Heel")
-        base.scale(0.05, 0.05, 0.05, r_rev_ankle)
-        base.move(-0.15, 0, 0, r_rev_ankle)
-        base.parent(r_rev_ankle, 'SECONDARY')
+        l_heelLoc = base.xform(base.ls("Loc_L_Foot"), q = True, t = True, ws = True)
+        base.move(l_heelLoc[0], l_heelLoc[1] - 0.1,l_heelLoc[2], l_rev_heel)
+        base.parent(l_rev_heel, 'SECONDARY')
+        
+        r_rev_heel = base.spaceLocator(n = "Loc_R_INV_Heel")
+        base.scale(0.05, 0.05, 0.05, r_rev_heel)
+        r_heelLoc = base.xform(base.ls("Loc_R_Foot"), q = True, t = True, ws = True)
+        base.move(r_heelLoc[0], r_heelLoc[1] - 0.1,r_heelLoc[2], r_rev_heel)
+        base.parent(r_rev_heel, 'SECONDARY')
     
     
         # toes
@@ -97,9 +100,13 @@ class SecondaryLocators():
         base.parent(r_rev_ankle, 'Loc_R_INV_Ball')
         
             
-    def CreateForearmTwist(amount):
+    def CreateForearmTwist(self, void, amount):
         base.select(deselect = True)
-        L_elbowPos = base.xform(base.ls('Loc_L_Elbow'), q = True, t = True, ws = True)
+        if(base.objExists('Loc_L_Elbow_1')):
+            L_elbowPos = base.xform(base.ls('Loc_L_Elbow_2'), q = True, t = True, ws = True)
+        else:
+            L_elbowPos = base.xform(base.ls('Loc_L_Elbow'), q = True, t = True, ws = True)
+        
         L_wristPos = base.xform(base.ls('Loc_L_Wrist'), q = True, t = True, ws = True)
         
         L_vectorY = L_wristPos[1] - L_elbowPos[1]
@@ -114,8 +121,12 @@ class SecondaryLocators():
             base.move(L_elbowPos[0] + (L_vectorX / amount) + ((L_vectorX / amount) * i), L_elbowPos[1] + (L_vectorY / amount) + ((L_vectorY / amount) * i), L_elbowPos[2] + (L_vectorZ / amount) + ((L_vectorZ / amount) * i), twistLoc)
             base.scale(0.05, 0.05, 0.05, twistLoc)
             base.parent(twistLoc, 'SECONDARY')
-                  
-        R_elbowPos = base.xform(base.ls('Loc_R_Elbow'), q = True, t = True, ws = True)
+        
+        if(base.objExists('Loc_R_Elbow_1')):
+            R_elbowPos = base.xform(base.ls('Loc_R_Elbow_2'), q = True, t = True, ws = True)          
+        else:
+            R_elbowPos = base.xform(base.ls('Loc_R_Elbow'), q = True, t = True, ws = True)
+
         R_wristPos = base.xform(base.ls('Loc_R_Wrist'), q = True, t = True, ws = True)
         
         R_vectorY = R_wristPos[1] - R_elbowPos[1]
@@ -129,7 +140,7 @@ class SecondaryLocators():
             base.scale(0.05, 0.05, 0.05, r_twistLoc)
             base.parent(r_twistLoc, 'SECONDARY')
     
-    def CreateVolumeLocators():
+    def CreateVolumeLocators(self, void):
         
         spineLocs = base.ls("Loc_SPINE_*", type = 'transform')
         print spineLocs
@@ -158,10 +169,10 @@ class SecondaryLocators():
                 base.parent(r_chestVolume, 'SECONDARY')
                 
             
-    def setColors():
+    def setColors(self, void):
         base.setAttr('SECONDARY.overrideEnabled', 1)
         base.setAttr('SECONDARY.overrideRGBColors', 1)
         base.setAttr('SECONDARY.overrideColorRGB', 1,1,1)
         
-    def DeleteSecondary():
+    def DeleteSecondary(self, void):
         base.delete(base.ls('SECONDARY'))    
