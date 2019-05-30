@@ -1,4 +1,6 @@
 import maya.cmds as base
+import maya.OpenMaya as om
+
 
 def CreateController(spineCount, fingerCount):
     #arrow = base.curve(p = [(1,0,0),(1,0,2), (2,0,2),(0,0,6), (-2,0,2), (-1,0,2), (-1,0,0), (1,0,0)], degree = 1)
@@ -36,55 +38,40 @@ def CreatePelvis():
     base.parent(pelvis_ctrl, "MASTER_CONTROLLER")       
     
 def CreateWrists():    
-
-    #left
-    L_wrist_ctrl1 = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_L_Wrist0")
-    L_wrist_ctrl2 = base.circle(nr = (1,0,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_L_Wrist1")
-    L_wrist_ctrl3 = base.circle(nr = (0,0,1), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_L_Wrist2")
-    L_wrist_ctrl = base.group(em = True, name ="CTRL_L_Wrist")
-    curves = [L_wrist_ctrl1,L_wrist_ctrl2, L_wrist_ctrl3]
+    sides = ['L', 'R']
     
-    for cv in curves:
-        crvShape = base.listRelatives(cv, shapes = True)
-        base.parent(crvShape, L_wrist_ctrl, s = True, r = True)
-        base.delete(cv)
-    base.select("CTRL_L_Wrist")    
-    base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)
-    base.scale(0.07, 0.07, 0.07, L_wrist_ctrl)
-
-    l_wristPos = base.xform(base.ls("RIG_L_Wrist"), q = True, t = True, ws = True)
-    l_wristRot = base.joint(base.ls("RIG_L_Wrist"), q = True, o = True)
+    for side in sides:
+        ctrl1 = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_"+side+ "_Wrist0")
+        ctrl2 = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_"+side+ "_Wrist1")
+        ctrl3 = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_"+side+ "_Wrist2")                
     
-    base.move(l_wristPos[0], l_wristPos[1], l_wristPos[2], L_wrist_ctrl)
-    base.rotate(0, 0, l_wristRot[0], L_wrist_ctrl)
-    
-    base.makeIdentity(L_wrist_ctrl, apply = True, t = 1, r = 1, s = 1)
-    base.parent(L_wrist_ctrl, "MASTER_CONTROLLER")
-    
-    #right
-    R_wrist_ctrl1 = base.circle(nr = (0,1,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_R_Wrist0")
-    R_wrist_ctrl2 = base.circle(nr = (1,0,0), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_R_Wrist1")
-    R_wrist_ctrl3 = base.circle(nr = (0,0,1), c = (0,0,0), radius = 1, degree = 1, s = 16, name = "CTRL_R_Wrist2")
-    R_wrist_ctrl = base.group(em = True, name ="CTRL_R_Wrist")
-    curves = [R_wrist_ctrl1,R_wrist_ctrl2, R_wrist_ctrl3]
-    
-    for cv in curves:
-        r_crvShape = base.listRelatives(cv, shapes = True)
-        base.parent(r_crvShape, R_wrist_ctrl, s = True, r = True)
-        base.delete(cv)
-    base.select("CTRL_R_Wrist")    
-    base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)    
-    base.scale(0.07, 0.07, 0.07, R_wrist_ctrl)
-    
-    r_wristPos = base.xform(base.ls("RIG_R_Wrist"), q = True, t = True, ws = True)
-    r_wristRot = base.joint(base.ls("RIG_R_Wrist"), q = True, o = True)
-    
-    base.move(r_wristPos[0], r_wristPos[1], r_wristPos[2], R_wrist_ctrl)
-    base.rotate(0, 0, r_wristRot[0], R_wrist_ctrl)
-    
-    base.makeIdentity(R_wrist_ctrl, apply = True, t = 1, r = 1, s = 1)
-    base.parent(R_wrist_ctrl, "MASTER_CONTROLLER")
-    
+        wrist_ctrl = base.group(em = True, name ="CTRL_"+side+"_Wrist")
+        curves = [ctrl1, ctrl2, ctrl3]
+        for cv in curves:
+            crvShape = base.listRelatives(cv, shapes = True)
+            base.parent(crvShape, wrist_ctrl, s = True, r = True)
+            base.delete(cv)
+        base.select("CTRL_"+side+"_Wrist")    
+        base.addAttr(shortName = "PV", longName = "Elbow_PV", attributeType = 'double', defaultValue = 0, minValue = -100, maxValue = 100, keyable = True)
+        base.scale(0.07, 0.07, 0.07, wrist_ctrl)
+        
+        
+        wristPos = base.xform(base.ls("RIG_"+side+"_Wrist"), q = True, t = True, ws = True)
+        wristRot = base.joint(base.ls("RIG_"+side+"_Wrist"), q = True, o = True)
+        if base.objExists("RIG_L_ArmTwist_*"):
+            armTwists = base.ls("RIG_L_ArmTwist_*")
+            print base.xform(base.ls("RIG_"+side+"_ArmTwist_"+str(len(armTwists) - 1)), q = True, ws = True, ro = True)
+            wristRotation = base.xform(base.ls("RIG_"+side+"_ArmTwist_"+str(len(armTwists) - 1)), q = True, ws = True, ro = True)
+        else:
+            wristRotation = base.xform(base.ls("RIG_"+side+"_Elbow"), q = True, ws = True, ro = True)
+        base.move(wristPos[0], wristPos[1], wristPos[2], wrist_ctrl)
+        wristGrp = base.group(em = True, name = 'CTRL_GRP_'+side+'_Wrist')
+        base.move(wristPos[0],wristPos[1],wristPos[2], wristGrp)
+        base.parent(wrist_ctrl, wristGrp)
+       # base.parent(wrist_ctrl, world = True)
+       
+        base.rotate(0,0, -wristRotation[2], wristGrp)
+        base.parent(wristGrp, "MASTER_CONTROLLER")
     
 def CreateClavicles(spineCount):
     l_clavicle = base.curve(p = [(1,0,0),(1,1,1), (1,1.5,2), (1,1.7,3), (1,1.5,4), (1,1,5), (1,0,6), (-1, 0,6), (-1,1,5), (-1,1.5,4), (-1,1.7,3), (-1,1.5,2), (-1,1,1), (-1,0,0) ], degree = 1, name = "CTRL_L_Clavicle")
@@ -198,36 +185,48 @@ def CreateFeet():
     base.parent(r_arrow, "MASTER_CONTROLLER")    
  
 def CreateFingers(fingerCount):
-    for i in range(0, fingerCount):
+    sides = ['L', 'R']
+    
+    for side in sides:
+        for i in range(0, fingerCount):
+            
+            #base.move(fingerPosition[0], fingerPosition[1], fingerPosition[2], fingerGrp)
+            #base.makeIdentity(fingerGrp, apply = True, t = 1, r = 1, s = 1) 
+            #print fingerRotation
+            for j in range(0,3):
+                #fingerRotation = base.xform(base.ls("RIG_"+side+"_Finger_"+str(i)+"_"+str(j)), q = True, ws = True, ro = True)
+                fingerRotation = base.xform(base.ls("Loc_"+side+"_Finger_"+str(i)+"_"+str(j)), q = True, ws = True, ro = True)
+                fingerPosition = base.xform(base.ls("Loc_"+side+"_Finger_"+str(i)+"_"+str(j)), q = True, ws = True, t = True)
+            
+                allFingers =  base.ls("RIG_"+side+"_Finger_"+str(i)+"_"+str(j))   
         
-        allFingers =  base.ls("RIG_L_Finger_"+str(i)+"_0")   
-        
+                finger = base.curve(p =[(0,0,0), (0,0,0.5), (0.2, 0, 0.7),(0,0,0.9), (-0.2, 0, 0.7), (0,0,0.5)], degree = 1, name = "CTRL_"+side+"_Finger_"+str(i)+"_"+str(j))
+                base.rotate(-90,0,0, finger)
+                           
+                #base.parent(finger, fingerGrp)
+                for k, fi in enumerate(allFingers):
+                    fingerPos = base.xform(fi, q = True, t = True, ws = True)
+                    fingerRot = base.joint(fi, q = True, o = True)
+                    base.scale(0.1, 0.1, 0.1, finger)    
+                    base.move(fingerPos[0], fingerPos[1], fingerPos[2], finger)
+                fingerGrp = base.group(em = True, n = "CTRL_GRP_"+side+"_Finger_"+str(i)+"_"+str(j))
+                base.move(fingerPosition[0], fingerPosition[1], fingerPosition[2], fingerGrp)
+                base.rotate(0, fingerRotation[1], 0, fingerGrp)     
+                base.makeIdentity(finger, apply = True, t = 1, r = 1, s = 1)      
+                base.makeIdentity(fingerGrp, apply = True, t = 1, r = 1, s = 1)      
+                base.parent(finger, fingerGrp)
+                base.rotate(0, fingerRotation[1], 0, fingerGrp, r = True)   
 
-        finger = base.curve(p =[(0,0,0), (0,0,0.5), (0.2, 0, 0.7),(0,0,0.9), (-0.2, 0, 0.7), (0,0,0.5)], degree = 1, name = "CTRL_L_Finger_"+str(i))
-        for j, fi in enumerate(allFingers):
-            fingerPos = base.xform(fi, q = True, t = True, ws = True)
-            fingerRot = base.joint(fi, q = True, o = True)
-            base.scale(0.1, 0.1, 0.1, finger)    
-            base.move(fingerPos[0], fingerPos[1], fingerPos[2], finger)
-            base.rotate(80,0,125, finger)
-        base.makeIdentity(finger, apply = True, t = 1, r = 1, s = 1)              
-        base.parent(finger, "CTRL_L_Wrist")
-        
-    for k in range(0, fingerCount):
-        
-        allFingers =  base.ls("RIG_R_Finger_"+str(k)+"_0")   
+                if j > 0:
+                    base.parent(fingerGrp, "CTRL_"+side+"_Finger_"+str(i)+"_"+str(j-1))
+                else:
+                    base.parent(fingerGrp, "CTRL_"+side+"_Wrist")
+                        
+            
+                                    
+            
 
-
-        finger = base.curve(p =[(0,0,0), (0,0,0.5), (0.2, 0, 0.7),(0,0,0.9), (-0.2, 0, 0.7), (0,0,0.5)], degree = 1, name = "CTRL_R_Finger_"+str(k))
-        for l, fi in enumerate(allFingers):
-            fingerPos = base.xform(fi, q = True, t = True, ws = True)
-            fingerRot = base.joint(fi, q = True, o = True)
-            base.scale(0.1, 0.1, 0.1, finger)    
-            base.move(fingerPos[0], fingerPos[1], fingerPos[2], finger)
-            base.rotate(80,0,-125, finger)
-        base.makeIdentity(finger, apply = True, t = 1, r = 1, s = 1)              
-        base.parent(finger, "CTRL_R_Wrist")
-        
+  
 def setColors():
     base.setAttr('MASTER_CONTROLLER.overrideEnabled', 1)
     base.setAttr('MASTER_CONTROLLER.overrideRGBColors', 1)

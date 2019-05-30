@@ -75,8 +75,21 @@ def CreateConstraints(fingerCount, spineAmount):
                 
     for k in range(0, fingerCount):
         l_allFingers = base.ls("RIG_L_Finger_"+str(k)+"_*")
-        r_allFingers = base.ls("RIG_R_Finger_"+str(k)+"_*")        
+        r_allFingers = base.ls("RIG_R_Finger_"+str(k)+"_*") 
         
+        for l in range(0,3):
+            if(k > 0):
+                base.connectAttr("CTRL_L_Finger_"+str(k)+"_"+str(l)+".rotateZ", l_allFingers[l]+".rotateZ")
+                base.connectAttr("CTRL_R_Finger_"+str(k)+"_"+str(l)+".rotateZ", r_allFingers[l]+".rotateZ")
+                base.connectAttr("CTRL_L_Finger_"+str(k)+"_"+str(l)+".rotateX", l_allFingers[l]+".rotateY")
+                base.connectAttr("CTRL_R_Finger_"+str(k)+"_"+str(l)+".rotateX", r_allFingers[l]+".rotateY")
+            else:
+                base.connectAttr("CTRL_L_Finger_"+str(k)+"_"+str(l)+".rotateZ", l_allFingers[l]+".rotateZ")
+                base.connectAttr("CTRL_R_Finger_"+str(k)+"_"+str(l)+".rotateZ", r_allFingers[l]+".rotateZ")
+                base.connectAttr("CTRL_L_Finger_"+str(k)+"_"+str(l)+".rotateX", l_allFingers[l]+".rotateY")
+                base.connectAttr("CTRL_R_Finger_"+str(k)+"_"+str(l)+".rotateX", r_allFingers[l]+".rotateY")                
+               
+        """
         if(k > 0):
             base.connectAttr("CTRL_L_Finger_"+str(k)+".rotateZ", l_allFingers[0]+".rotateY")
             base.connectAttr("CTRL_R_Finger_"+str(k)+".rotateZ", r_allFingers[0]+".rotateY")
@@ -95,7 +108,7 @@ def CreateConstraints(fingerCount, spineAmount):
             
             for m, r_finger in enumerate(r_allFingers):
                 base.connectAttr("CTRL_R_Finger_"+str(k)+".rotateX", r_finger+".rotateZ")            
-        
+        """
     if base.objExists("RIG_L_INV_Heel"):
         base.pointConstraint("RIG_L_INV_Toes", "IK_L_Toes", mo = True)
         base.pointConstraint("RIG_L_INV_Ball", "IK_L_FootBall", mo = True)

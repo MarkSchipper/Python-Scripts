@@ -4,8 +4,8 @@ def LockAttributes():
     axis = ['X', 'Y', 'Z']
     
     allSpines = base.ls('CTRL_SPINE_*', type = 'transform')
-    l_allFingers = base.ls('CTRL_L_Finger_*', type = 'transform')
-    r_allFingers = base.ls('CTRL_R_Finger_*', type = 'transform')
+    l_allFingers = base.ls('CTRL_L_Finger_*_0', type = 'transform')
+    r_allFingers = base.ls('CTRL_R_Finger_*_0', type = 'transform')
     
     for axe in axis:
        
@@ -29,11 +29,11 @@ def LockAttributes():
         
         base.setAttr('CTRL_HEAD.scale'+axe, lock = True, k = False)    
         base.setAttr('CTRL_HEAD.translate'+axe, lock = True, k = False)
-        
-        base.setAttr('CTRL_BREATHING.scale'+axe, lock = True, k = False)        
-        base.setAttr('CTRL_BREATHING.translate'+axe, lock = True, k = False)        
-        base.setAttr('CTRL_BREATHING.rotateY', lock = True, k = False)
-        base.setAttr('CTRL_BREATHING.rotateZ', lock = True, k = False)
+        if(base.objExists("CTRL_BREATING")):
+            base.setAttr('CTRL_BREATHING.scale'+axe, lock = True, k = False)        
+            base.setAttr('CTRL_BREATHING.translate'+axe, lock = True, k = False)        
+            base.setAttr('CTRL_BREATHING.rotateY', lock = True, k = False)
+            base.setAttr('CTRL_BREATHING.rotateZ', lock = True, k = False)
         
         base.setAttr('CTRL_JAW.scale'+axe, lock = True, k = False)        
         base.setAttr('CTRL_JAW.translate'+axe, lock = True, k = False)        
@@ -41,17 +41,13 @@ def LockAttributes():
         base.setAttr('CTRL_JAW.rotateZ', lock = True, k = False) 
         
         for j in range(0, len(l_allFingers)):
-            base.setAttr('CTRL_L_Finger_'+str(j)+'.scale'+axe, lock = True, k = False)
-            base.setAttr('CTRL_R_Finger_'+str(j)+'.scale'+axe, lock = True, k = False)
+            for k in range(0,3):
+                base.setAttr('CTRL_L_Finger_'+str(j)+"_"+str(k)+'.scale'+axe, lock = True, k = False)
+                base.setAttr('CTRL_R_Finger_'+str(j)+"_"+str(k)+'.scale'+axe, lock = True, k = False)
+                
+                base.setAttr('CTRL_L_Finger_'+str(j)+"_"+str(k)+'.translate'+axe, lock = True, k = False)            
+                base.setAttr('CTRL_R_Finger_'+str(j)+"_"+str(k)+'.translate'+axe, lock = True, k = False)
             
-            base.setAttr('CTRL_L_Finger_'+str(j)+'.translate'+axe, lock = True, k = False)            
-            base.setAttr('CTRL_R_Finger_'+str(j)+'.translate'+axe, lock = True, k = False)
-            
-            #base.setAttr('CTRL_L_Finger_'+str(j)+'.rotateX', lock = True, k = False)            
-            #base.setAttr('CTRL_L_Finger_'+str(j)+'.rotateY', lock = True, k = False)            
-                        
-            #base.setAttr('CTRL_R_Finger_'+str(j)+'.rotateX', lock = True, k = False)            
-            #base.setAttr('CTRL_R_Finger_'+str(j)+'.rotateY', lock = True, k = False)            
             
             
             

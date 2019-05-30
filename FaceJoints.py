@@ -300,7 +300,7 @@ class FaceJoints():
         self.AddControllers(self)                         
                     
     def AddControllers(self, void):
-        
+        print "add controllers"
         sides = ['L', 'R']
         l_eyeCtrlPos = []
         r_eyeCtrlPos = []
@@ -310,13 +310,21 @@ class FaceJoints():
             
             for jo in allJoints:
                 ctrl = base.polyCylinder(r = 0.0015, h = 0.001, ax = [0,0,1], n = "FACE_CTRL_"+str(jo).split("FACERIG_")[1])
-                ctrlGrp = base.group(em = True, n = "GRP_FACE_CTRL_"+str(jo).split("FACERIG_")[1])
-                
                 jointPos = base.xform(jo, q = True, t = True, ws = True)
-                
-                base.move(jointPos[0], jointPos[1], jointPos[2] + 0.001, ctrl)
-                base.move(jointPos[0], jointPos[1], jointPos[2] + 0.001, ctrlGrp)
-                base.parent(base.ls(ctrl, type = 'transform')[0], ctrlGrp)
+                if "LowerMouth" in jo:
+                    ctrlGrp = base.group(em = True, n = "GRP_FACE_CTRL_"+str(jo).split("FACERIG_")[1])                    
+                    base.parent(base.ls(ctrl, type = 'transform')[0], ctrlGrp)
+                    upperGrp = base.group(em = True, n = "UPPER_GRP_FACE_CTRL_"+str(jo).split("FACERIG_")[1])
+                    base.parent(ctrlGrp, upperGrp)
+                    base.move(jointPos[0], jointPos[1], jointPos[2] + 0.001, upperGrp)
+                    base.move(jointPos[0], jointPos[1], jointPos[2] + 0.001, ctrl)
+                    base.move(jointPos[0], jointPos[1], jointPos[2] + 0.001, ctrlGrp)
+
+                else:
+                    ctrlGrp = base.group(em = True, n = "GRP_FACE_CTRL_"+str(jo).split("FACERIG_")[1])                
+                    base.move(jointPos[0], jointPos[1], jointPos[2] + 0.001, ctrl)
+                    base.move(jointPos[0], jointPos[1], jointPos[2] + 0.001, ctrlGrp)
+                    base.parent(base.ls(ctrl, type = 'transform')[0], ctrlGrp)
                 
                 if "EyeLid" in jo:
                     if "_rotateJoint" in jo:
@@ -397,352 +405,377 @@ class FaceJoints():
         
     def AddUtilities(self, void):
         
-        allCtrlGrps = base.ls("GRP_FACE_CTRL_*")
-        base.parent(allCtrlGrps, "MASTER_FACE_CTRL")
+        allCtrlGrps = base.ls("*GRP_FACE_CTRL_*")
+        for grps in allCtrlGrps:
+            if "LowerMouth" in grps:
+                if "UPPER_GRP" in grps:
+                    base.parent(grps, "MASTER_FACE_CTRL")
+            else:    
+                base.parent(grps, "MASTER_FACE_CTRL")
         
         base.connectAttr("FACE_MAIN_CTRL_PARENT_EYES.translate", "FACE_MAIN_CTRL_L_EYE_AIM.translate")
         base.connectAttr("FACE_MAIN_CTRL_PARENT_EYES.translate", "FACE_MAIN_CTRL_R_EYE_AIM.translate")        
            
     
         for i, grp in enumerate(allCtrlGrps):
-            base.makeIdentity(grp, apply = True, t = 1, r = 1, s = 1)
-            
-            multDiv = base.shadingNode("multiplyDivide", asUtility = True, n = "Face_Node_"+str(i))
-            unitConv1 = base.shadingNode("unitConversion", asUtility = True, n = "Face_Node_UnitConversionIn_"+str(i))
-            unitConv2 = base.shadingNode("unitConversion", asUtility = True, n = "Face_Node_UnitConversionOut_"+str(i))
-            base.setAttr(multDiv+".operation", 1)            
-            
-            if "UpperEyeLid" in grp:
-                if "0" in grp:
-                    base.setAttr(multDiv+".input2X", 0.001)
-                    base.setAttr(multDiv+".input2Y", 0.01)
-                    base.setAttr(multDiv+".input2Z", 0)
-                elif "1" in grp:
-                    base.setAttr(multDiv+".input2X", 0.002)
-                    base.setAttr(multDiv+".input2Y", 0.035)
-                    base.setAttr(multDiv+".input2Z", 0)                                    
-                    
-                elif "2" in grp:
-                    base.setAttr(multDiv+".input2X", 0.005)
-                    base.setAttr(multDiv+".input2Y", 0.05)
-                    base.setAttr(multDiv+".input2Z", 0)                      
-
-                elif "3" in grp:
-                    base.setAttr(multDiv+".input2X", 0.0015)
-                    base.setAttr(multDiv+".input2Y", 0.03)
-                    base.setAttr(multDiv+".input2Z", 0)  
-                else:
-                    base.setAttr(multDiv+".input2X", 0.001)
-                    base.setAttr(multDiv+".input2Y", 0.01)
-                    base.setAttr(multDiv+".input2Z", 0)                      
-                        
-                if "_L_" in grp:
-                    base.connectAttr("FACE_MAIN_CTRL_L_EYE_AIM.translate", unitConv1+".input")
-                else:
-                    base.connectAttr("FACE_MAIN_CTRL_R_EYE_AIM.translate", unitConv1+".input")
+            if "UPPER_GRP" in grp:
+                base.makeIdentity(grp, apply = True, t = 1, r = 1, s = 1)
                 
-                base.connectAttr(unitConv1+".output", multDiv+".input1")
-                base.connectAttr(multDiv+".output", unitConv2+".input")
-                base.connectAttr(unitConv2+".output", grp+".translate")
-            
-            if "LowerEyeLid" in grp:
-                if "0" in grp:
-                    base.setAttr(multDiv+".input2X", 0.001)
-                    base.setAttr(multDiv+".input2Y", 0.005)
-                    base.setAttr(multDiv+".input2Z", 0)
-                elif "1" in grp:
-                    base.setAttr(multDiv+".input2X", 0.002)
-                    base.setAttr(multDiv+".input2Y", 0.0125)
-                    base.setAttr(multDiv+".input2Z", 0)                                    
-                    
-                elif "2" in grp:
-                    base.setAttr(multDiv+".input2X", 0.005)
-                    base.setAttr(multDiv+".input2Y", 0.02)
-                    base.setAttr(multDiv+".input2Z", 0)                      
-
-                elif "3" in grp:
-                    base.setAttr(multDiv+".input2X", 0.0015)
-                    base.setAttr(multDiv+".input2Y", 0.01)
-                    base.setAttr(multDiv+".input2Z", 0)  
-                else:
-                    base.setAttr(multDiv+".input2X", 0.001)
-                    base.setAttr(multDiv+".input2Y", 0.005)
-                    base.setAttr(multDiv+".input2Z", 0)                      
-                        
-                if "_L_" in grp:
-                    base.connectAttr("FACE_MAIN_CTRL_L_EYE_AIM.translate", unitConv1+".input")
-                else:
-                    base.connectAttr("FACE_MAIN_CTRL_R_EYE_AIM.translate", unitConv1+".input")
+                lower_multDiv = base.shadingNode("multiplyDivide", asUtility = True, n = "Face_Node_"+str(i))
+                lower_unitConv1 = base.shadingNode("unitConversion", asUtility = True, n = "Face_Node_UnitConversionIn_"+str(i))
+                lower_unitConv2 = base.shadingNode("unitConversion", asUtility = True, n = "Face_Node_UnitConversionOut_"+str(i))
+                base.setAttr(lower_multDiv+".operation", 1)
+                base.setAttr(lower_multDiv+".input2X", -0.0015)
+                base.setAttr(lower_multDiv+".input2Y", 0)
+                base.setAttr(lower_multDiv+".input2Z", 0)
+                base.connectAttr("CTRL_JAW.rotate", lower_multDiv+".input1")
+                #base.connectAttr("CTRL_JAW.rotate", lower_unitConv1+".input")
+                #base.connectAttr(lower_unitConv1+".output", lower_multDiv+".input1")
+                base.connectAttr(lower_multDiv+".output.outputX", grp+".translateY")
+                #base.connectAttr(lower_unitConv2+".output.", grp+".translate")
                 
-                base.connectAttr(unitConv1+".output", multDiv+".input1")
-                base.connectAttr(multDiv+".output", unitConv2+".input")
-                base.connectAttr(unitConv2+".output", grp+".translate")
+                #base.connectAttr("CTRL_JAW.rotateX", grp+".translateY")
+            else:    
+                base.makeIdentity(grp, apply = True, t = 1, r = 1, s = 1)
+                
+                multDiv = base.shadingNode("multiplyDivide", asUtility = True, n = "Face_Node_"+str(i))
+                unitConv1 = base.shadingNode("unitConversion", asUtility = True, n = "Face_Node_UnitConversionIn_"+str(i))
+                unitConv2 = base.shadingNode("unitConversion", asUtility = True, n = "Face_Node_UnitConversionOut_"+str(i))
+                base.setAttr(multDiv+".operation", 1)            
                 
                 
-            if "EyeAim" in grp:
-                base.setAttr(multDiv+".input2X", 0.1)
-                base.setAttr(multDiv+".input2Y", 0.1)
-                base.setAttr(multDiv+".input2Z", 0.1)
                 
-                if "_L_" in grp:
-                    base.connectAttr("FACE_MAIN_CTRL_L_EYE_AIM.translate", unitConv1+".input")
-                else:
-                    base.connectAttr("FACE_MAIN_CTRL_R_EYE_AIM.translate", unitConv1+".input")
-                
-                base.connectAttr(unitConv1+".output", multDiv+".input1")
-                base.connectAttr(multDiv+".output", unitConv2+".input")
-                base.connectAttr(unitConv2+".output", grp+".translate")
-                    
-            if "Brow" in grp:
-                if "ForeHead" in grp:
+                if "UpperEyeLid" in grp:
                     if "0" in grp:
-                        base.setAttr(multDiv+".input2X", 0.2)
-                        base.setAttr(multDiv+".input2Y", 0.2)
-                        base.setAttr(multDiv+".input2Z", 0.2)                        
-                        
-                        if "_L_" in grp:
-                            base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_1.translate", unitConv1+".input")
-                        else:
-                            base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_1.translate", unitConv1+".input")                                
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
+                        base.setAttr(multDiv+".input2X", 0.001)
+                        base.setAttr(multDiv+".input2Y", 0.01)
+                        base.setAttr(multDiv+".input2Z", 0)
                     elif "1" in grp:
-                        base.setAttr(multDiv+".input2X", 0.15)
-                        base.setAttr(multDiv+".input2Y", 0.15)
-                        base.setAttr(multDiv+".input2Z", 0.15)                        
-                        
-                        if "_L_" in grp:
-                            base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_1.translate", unitConv1+".input")
-                        else:
-                            base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_1.translate", unitConv1+".input")                                
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
+                        base.setAttr(multDiv+".input2X", 0.002)
+                        base.setAttr(multDiv+".input2Y", 0.035)
+                        base.setAttr(multDiv+".input2Z", 0)                                    
                         
                     elif "2" in grp:
-                        base.setAttr(multDiv+".input2X", 0.2)
-                        base.setAttr(multDiv+".input2Y", 0.2)
-                        base.setAttr(multDiv+".input2Z", 0.2)                        
-                        
-                        if "_L_" in grp:
-                            base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_2.translate", unitConv1+".input")
-                        else:
-                            base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_2.translate", unitConv1+".input")                                
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                        
-                    else:
-                        base.setAttr(multDiv+".input2X", 0.1)
-                        base.setAttr(multDiv+".input2Y", 0.1)
-                        base.setAttr(multDiv+".input2Z", 0.1)                        
-                        
-                        if "_L_" in grp:
-                            base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_2.translate", unitConv1+".input")
-                        else:
-                            base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_2.translate", unitConv1+".input")                                
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                else:
-                    if "0" in grp:
-                        base.setAttr(multDiv+".input2X", 0.8)
-                        base.setAttr(multDiv+".input2Y", 0.8)
-                        base.setAttr(multDiv+".input2Z", 0.8)                        
-                        
-                        if "_L_" in grp:
-                            base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_1.translate", unitConv1+".input")
-                        else:
-                            base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_1.translate", unitConv1+".input")                                
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                    elif "1" in grp:
-                        base.setAttr(multDiv+".input2X", 0.6)
-                        base.setAttr(multDiv+".input2Y", 0.6)
-                        base.setAttr(multDiv+".input2Z", 0.6)                        
-                        
-                        if "_L_" in grp:
-                            base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_1.translate", unitConv1+".input")
-                        else:
-                            base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_1.translate", unitConv1+".input")                                
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                        
-                    elif "2" in grp:
-                        base.setAttr(multDiv+".input2X", 0.6)
-                        base.setAttr(multDiv+".input2Y", 0.6)
-                        base.setAttr(multDiv+".input2Z", 0.6)                        
-                        
-                        if "_L_" in grp:
-                            base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_2.translate", unitConv1+".input")
-                        else:
-                            base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_2.translate", unitConv1+".input")                                
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                        
-                    else:
-                        base.setAttr(multDiv+".input2X", 0.3)
-                        base.setAttr(multDiv+".input2Y", 0.3)
-                        base.setAttr(multDiv+".input2Z", 0.3)                        
-                        
-                        if "_L_" in grp:
-                            base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_2.translate", unitConv1+".input")
-                        else:
-                            base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_2.translate", unitConv1+".input")                                
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")                                     
-            
-            if "Cheek" in grp:
-                if "Upper" in grp:
-                    if "_L_" in grp:
-                        base.setAttr(multDiv+".input2X", 0.15)
-                        base.setAttr(multDiv+".input2Y", 0.15)
-                        base.setAttr(multDiv+".input2Z", 0.15)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate") 
-                    else:
-                        base.setAttr(multDiv+".input2X", 0.15)
-                        base.setAttr(multDiv+".input2Y", 0.15)
-                        base.setAttr(multDiv+".input2Z", 0.15)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")     
-                else:
-                    if "_L_" in grp:
-                        base.setAttr(multDiv+".input2X", 0.5)
-                        base.setAttr(multDiv+".input2Y", 0.5)
-                        base.setAttr(multDiv+".input2Z", 0.5)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_L_UpperCheek.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate") 
-                    else:
-                        base.setAttr(multDiv+".input2X", 0.5)
-                        base.setAttr(multDiv+".input2Y", 0.5)
-                        base.setAttr(multDiv+".input2Z", 0.5)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_R_UpperCheek.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                    
-            if "Smile" in grp:
-                if "_L_" in grp:
-                    if "0" in grp:
-                        base.setAttr(multDiv+".input2X", 0.15)
-                        base.setAttr(multDiv+".input2Y", 0.15)
-                        base.setAttr(multDiv+".input2Z", 0.15)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                    elif "1" in grp:
-                        base.setAttr(multDiv+".input2X", 0.4)
-                        base.setAttr(multDiv+".input2Y", 0.4)
-                        base.setAttr(multDiv+".input2Z", 0.4)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                    
-                    elif "2" in grp:
-                        base.setAttr(multDiv+".input2X", 0.7)
-                        base.setAttr(multDiv+".input2Y", 0.7)
-                        base.setAttr(multDiv+".input2Z", 0.7)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                        
-
-                    else:
-                        base.setAttr(multDiv+".input2X", 0.35)
-                        base.setAttr(multDiv+".input2Y", 0.35)
-                        base.setAttr(multDiv+".input2Z", 0.35)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")    
-                if "_R_" in grp:
-                    if "0" in grp:
-                        base.setAttr(multDiv+".input2X", 0.15)
-                        base.setAttr(multDiv+".input2Y", 0.15)
-                        base.setAttr(multDiv+".input2Z", 0.15)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                    elif "1" in grp:
-                        base.setAttr(multDiv+".input2X", 0.4)
-                        base.setAttr(multDiv+".input2Y", 0.4)
-                        base.setAttr(multDiv+".input2Z", 0.4)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                    
-                    elif "2" in grp:
-                        base.setAttr(multDiv+".input2X", 0.7)
-                        base.setAttr(multDiv+".input2Y", 0.7)
-                        base.setAttr(multDiv+".input2Z", 0.7)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                        
-
-                    else:
-                        base.setAttr(multDiv+".input2X", 0.35)
-                        base.setAttr(multDiv+".input2Y", 0.35)
-                        base.setAttr(multDiv+".input2Z", 0.35)                        
-                    
-                        base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate") 
-            if "Mouth" in grp:
-                if "MouthCorner" in grp:
-                    pass
-                else:
-                    grpValue = str(allCtrlGrps[i]).split("Mouth_")
-                    base.setAttr(multDiv+".input2X", float(grpValue[1]) * 0.3)    
-                    base.setAttr(multDiv+".input2Y", float(grpValue[1]) * 0.3)
-                    base.setAttr(multDiv+".input2Z", float(grpValue[1]) * 0.3)                        
+                        base.setAttr(multDiv+".input2X", 0.005)
+                        base.setAttr(multDiv+".input2Y", 0.05)
+                        base.setAttr(multDiv+".input2Z", 0)                      
     
-                    if "_L_" in grp:
-                        base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-                        
-                        
+                    elif "3" in grp:
+                        base.setAttr(multDiv+".input2X", 0.0015)
+                        base.setAttr(multDiv+".input2Y", 0.03)
+                        base.setAttr(multDiv+".input2Z", 0)  
                     else:
-                        base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
-                        base.connectAttr(unitConv1+".output", multDiv+".input1")
-                        base.connectAttr(multDiv+".output", unitConv2+".input")
-                        base.connectAttr(unitConv2+".output", grp+".translate")
-        
-                if "LowerMouth" in grp:
+                        base.setAttr(multDiv+".input2X", 0.001)
+                        base.setAttr(multDiv+".input2Y", 0.01)
+                        base.setAttr(multDiv+".input2Z", 0)                      
+                            
+                    if "_L_" in grp:
+                        base.connectAttr("FACE_MAIN_CTRL_L_EYE_AIM.translate", unitConv1+".input")
+                    else:
+                        base.connectAttr("FACE_MAIN_CTRL_R_EYE_AIM.translate", unitConv1+".input")
                     
-                    base.parentConstraint("CTRL_JAW", grp, mo = True)
+                    base.connectAttr(unitConv1+".output", multDiv+".input1")
+                    base.connectAttr(multDiv+".output", unitConv2+".input")
+                    base.connectAttr(unitConv2+".output", grp+".translate")
+                
+                if "LowerEyeLid" in grp:
+                    if "0" in grp:
+                        base.setAttr(multDiv+".input2X", 0.001)
+                        base.setAttr(multDiv+".input2Y", 0.005)
+                        base.setAttr(multDiv+".input2Z", 0)
+                    elif "1" in grp:
+                        base.setAttr(multDiv+".input2X", 0.002)
+                        base.setAttr(multDiv+".input2Y", 0.0125)
+                        base.setAttr(multDiv+".input2Z", 0)                                    
+                        
+                    elif "2" in grp:
+                        base.setAttr(multDiv+".input2X", 0.005)
+                        base.setAttr(multDiv+".input2Y", 0.02)
+                        base.setAttr(multDiv+".input2Z", 0)                      
+    
+                    elif "3" in grp:
+                        base.setAttr(multDiv+".input2X", 0.0015)
+                        base.setAttr(multDiv+".input2Y", 0.01)
+                        base.setAttr(multDiv+".input2Z", 0)  
+                    else:
+                        base.setAttr(multDiv+".input2X", 0.001)
+                        base.setAttr(multDiv+".input2Y", 0.005)
+                        base.setAttr(multDiv+".input2Z", 0)                      
+                            
+                    if "_L_" in grp:
+                        base.connectAttr("FACE_MAIN_CTRL_L_EYE_AIM.translate", unitConv1+".input")
+                    else:
+                        base.connectAttr("FACE_MAIN_CTRL_R_EYE_AIM.translate", unitConv1+".input")
+                    
+                    base.connectAttr(unitConv1+".output", multDiv+".input1")
+                    base.connectAttr(multDiv+".output", unitConv2+".input")
+                    base.connectAttr(unitConv2+".output", grp+".translate")
+                    
+                    
+                if "EyeAim" in grp:
+                    base.setAttr(multDiv+".input2X", 0.1)
+                    base.setAttr(multDiv+".input2Y", 0.1)
+                    base.setAttr(multDiv+".input2Z", 0.1)
+                    
+                    if "_L_" in grp:
+                        base.connectAttr("FACE_MAIN_CTRL_L_EYE_AIM.translate", unitConv1+".input")
+                    else:
+                        base.connectAttr("FACE_MAIN_CTRL_R_EYE_AIM.translate", unitConv1+".input")
+                    
+                    base.connectAttr(unitConv1+".output", multDiv+".input1")
+                    base.connectAttr(multDiv+".output", unitConv2+".input")
+                    base.connectAttr(unitConv2+".output", grp+".translate")
+                        
+                if "Brow" in grp:
+                    if "ForeHead" in grp:
+                        if "0" in grp:
+                            base.setAttr(multDiv+".input2X", 0.2)
+                            base.setAttr(multDiv+".input2Y", 0.2)
+                            base.setAttr(multDiv+".input2Z", 0.2)                        
+                            
+                            if "_L_" in grp:
+                                base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_1.translate", unitConv1+".input")
+                            else:
+                                base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_1.translate", unitConv1+".input")                                
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                        elif "1" in grp:
+                            base.setAttr(multDiv+".input2X", 0.15)
+                            base.setAttr(multDiv+".input2Y", 0.15)
+                            base.setAttr(multDiv+".input2Z", 0.15)                        
+                            
+                            if "_L_" in grp:
+                                base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_1.translate", unitConv1+".input")
+                            else:
+                                base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_1.translate", unitConv1+".input")                                
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                            
+                        elif "2" in grp:
+                            base.setAttr(multDiv+".input2X", 0.2)
+                            base.setAttr(multDiv+".input2Y", 0.2)
+                            base.setAttr(multDiv+".input2Z", 0.2)                        
+                            
+                            if "_L_" in grp:
+                                base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_2.translate", unitConv1+".input")
+                            else:
+                                base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_2.translate", unitConv1+".input")                                
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                            
+                        else:
+                            base.setAttr(multDiv+".input2X", 0.1)
+                            base.setAttr(multDiv+".input2Y", 0.1)
+                            base.setAttr(multDiv+".input2Z", 0.1)                        
+                            
+                            if "_L_" in grp:
+                                base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_2.translate", unitConv1+".input")
+                            else:
+                                base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_2.translate", unitConv1+".input")                                
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                    else:
+                        if "0" in grp:
+                            base.setAttr(multDiv+".input2X", 0.8)
+                            base.setAttr(multDiv+".input2Y", 0.8)
+                            base.setAttr(multDiv+".input2Z", 0.8)                        
+                            
+                            if "_L_" in grp:
+                                base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_1.translate", unitConv1+".input")
+                            else:
+                                base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_1.translate", unitConv1+".input")                                
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                        elif "1" in grp:
+                            base.setAttr(multDiv+".input2X", 0.6)
+                            base.setAttr(multDiv+".input2Y", 0.6)
+                            base.setAttr(multDiv+".input2Z", 0.6)                        
+                            
+                            if "_L_" in grp:
+                                base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_1.translate", unitConv1+".input")
+                            else:
+                                base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_1.translate", unitConv1+".input")                                
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                            
+                        elif "2" in grp:
+                            base.setAttr(multDiv+".input2X", 0.6)
+                            base.setAttr(multDiv+".input2Y", 0.6)
+                            base.setAttr(multDiv+".input2Z", 0.6)                        
+                            
+                            if "_L_" in grp:
+                                base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_2.translate", unitConv1+".input")
+                            else:
+                                base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_2.translate", unitConv1+".input")                                
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                            
+                        else:
+                            base.setAttr(multDiv+".input2X", 0.3)
+                            base.setAttr(multDiv+".input2Y", 0.3)
+                            base.setAttr(multDiv+".input2Z", 0.3)                        
+                            
+                            if "_L_" in grp:
+                                base.connectAttr("FACE_MAIN_CTRL_L_UpperEyeBrow_2.translate", unitConv1+".input")
+                            else:
+                                base.connectAttr("FACE_MAIN_CTRL_R_UpperEyeBrow_2.translate", unitConv1+".input")                                
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")                                     
+                
+                if "Cheek" in grp:
+                    if "Upper" in grp:
+                        if "_L_" in grp:
+                            base.setAttr(multDiv+".input2X", 0.15)
+                            base.setAttr(multDiv+".input2Y", 0.15)
+                            base.setAttr(multDiv+".input2Z", 0.15)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate") 
+                        else:
+                            base.setAttr(multDiv+".input2X", 0.15)
+                            base.setAttr(multDiv+".input2Y", 0.15)
+                            base.setAttr(multDiv+".input2Z", 0.15)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")     
+                    else:
+                        if "_L_" in grp:
+                            base.setAttr(multDiv+".input2X", 0.5)
+                            base.setAttr(multDiv+".input2Y", 0.5)
+                            base.setAttr(multDiv+".input2Z", 0.5)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_L_UpperCheek.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate") 
+                        else:
+                            base.setAttr(multDiv+".input2X", 0.5)
+                            base.setAttr(multDiv+".input2Y", 0.5)
+                            base.setAttr(multDiv+".input2Z", 0.5)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_R_UpperCheek.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                        
+                if "Smile" in grp:
+                    if "_L_" in grp:
+                        if "0" in grp:
+                            base.setAttr(multDiv+".input2X", 0.15)
+                            base.setAttr(multDiv+".input2Y", 0.15)
+                            base.setAttr(multDiv+".input2Z", 0.15)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                        elif "1" in grp:
+                            base.setAttr(multDiv+".input2X", 0.4)
+                            base.setAttr(multDiv+".input2Y", 0.4)
+                            base.setAttr(multDiv+".input2Z", 0.4)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                        
+                        elif "2" in grp:
+                            base.setAttr(multDiv+".input2X", 0.7)
+                            base.setAttr(multDiv+".input2Y", 0.7)
+                            base.setAttr(multDiv+".input2Z", 0.7)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                            
+    
+                        else:
+                            base.setAttr(multDiv+".input2X", 0.35)
+                            base.setAttr(multDiv+".input2Y", 0.35)
+                            base.setAttr(multDiv+".input2Z", 0.35)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")    
+                    if "_R_" in grp:
+                        if "0" in grp:
+                            base.setAttr(multDiv+".input2X", 0.15)
+                            base.setAttr(multDiv+".input2Y", 0.15)
+                            base.setAttr(multDiv+".input2Z", 0.15)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                        elif "1" in grp:
+                            base.setAttr(multDiv+".input2X", 0.4)
+                            base.setAttr(multDiv+".input2Y", 0.4)
+                            base.setAttr(multDiv+".input2Z", 0.4)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                        
+                        elif "2" in grp:
+                            base.setAttr(multDiv+".input2X", 0.7)
+                            base.setAttr(multDiv+".input2Y", 0.7)
+                            base.setAttr(multDiv+".input2Z", 0.7)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                            
+    
+                        else:
+                            base.setAttr(multDiv+".input2X", 0.35)
+                            base.setAttr(multDiv+".input2Y", 0.35)
+                            base.setAttr(multDiv+".input2Z", 0.35)                        
+                        
+                            base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate") 
+                if "Mouth" in grp:
+                    if "MouthCorner" in grp:
+                        pass
+                    else:
+                        grpValue = str(allCtrlGrps[i]).split("Mouth_")
+                        base.setAttr(multDiv+".input2X", float(grpValue[1]) * 0.3)    
+                        base.setAttr(multDiv+".input2Y", float(grpValue[1]) * 0.3)
+                        base.setAttr(multDiv+".input2Z", float(grpValue[1]) * 0.3)                        
+        
+                        if "_L_" in grp:
+                            base.connectAttr("FACE_MAIN_CTRL_L_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+                            
+                            
+                        else:
+                            base.connectAttr("FACE_MAIN_CTRL_R_MouthCorner.translate", unitConv1+".input")
+                            base.connectAttr(unitConv1+".output", multDiv+".input1")
+                            base.connectAttr(multDiv+".output", unitConv2+".input")
+                            base.connectAttr(unitConv2+".output", grp+".translate")
+        
+#                if "LowerMouth" in grp:
+                    
+                    #base.parentConstraint("CTRL_JAW", grp, mo = True)
                     
         allCtrls = base.ls("FACE_CTRL_*", type = 'transform')
         allJoints = base.ls("FACERIG_*", type = 'joint')

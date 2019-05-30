@@ -123,7 +123,8 @@ class AutoRigger():
         Controller.CreateController(_spineCount, _fingerCount)
         CreateIK.IKHandles()
         Constraints.CreateConstraints(_fingerCount, _spineCount)  
-        FJ.FaceJoints().AddConstraints(self)     
+        if(base.objExists("FACERIG_*")):        
+            FJ.FaceJoints().AddConstraints(self)     
 
     def ClearScene(self, void):
         base.delete("Loc_Master")

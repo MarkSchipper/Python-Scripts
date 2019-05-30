@@ -350,9 +350,19 @@ def mirrorLocators():
     allRightLocators = base.ls("Loc_R_*", type = 'transform')
      
     for i,l in enumerate(allLeftLocators):
-        pos = base.xform(l, q = True, t=True, ws = True)
-        
-        base.move(-pos[0], pos[1], pos[2], allRightLocators[i])
+        if "Finger" in l:
+            pos = base.xform(l, q = True, t=True, ws = True)
+            if "_0" in l:
+                rot = base.xform(l, q = True, ro = True, ws = True)
+                base.rotate(rot[0], -rot[1], rot[2], allRightLocators[i])
+                base.move(-pos[0], pos[1], pos[2], allRightLocators[i])
+            else:
+                base.move(-pos[0], pos[1], pos[2], allRightLocators[i])
+        else:        
+            pos = base.xform(l, q = True, t=True, ws = True)
+            rot = base.xform(l, q = True, ro = True, ws = True)
+            base.move(-pos[0], pos[1], pos[2], allRightLocators[i])
+        #
             
 def deleteLocators():
     nodes = base.ls("Loc_*")
